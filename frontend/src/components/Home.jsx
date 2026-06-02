@@ -1,10 +1,60 @@
-export default function Home({ onGoToLogin, onGoToRegister }) {
+import { useState } from "react";
+import useCountUp from "./useCountUp";
+
+// Données stats — on remplacera par les vraies données API quand elles sont dispo
+const STATS = [
+  { target: 1240, label: "Jeux" },
+  { target: 8500, label: "Avis" },
+  { target: 3200, label: "Joueurs" },
+];
+/* // Plus tard — données de l'API
+const STATS = [
+  { target: data.totalJeux, label: "Jeux" },
+  { target: data.totalAvis, label: "Avis" },
+  { target: data.totalJoueurs, label: "Joueurs" },
+]; */
+
+function AnimatedStat({ target, label, delay }) {
+  const count = useCountUp(target, 2200, delay);
+
+  // Formatage avec espace comme séparateur de milliers : 1240 → "1 240"
+  const formatted = count.toLocaleString("fr-FR").replace(/\u202f/g, "\u00a0");
+
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "#0d0d1a" }}
-    >
-      {/* ── Fond dégradé radial comme la maquette ── */}
+    <div className="flex flex-col items-center gap-1">
+      <span
+        className="font-black tabular-nums"
+        style={{
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: "clamp(1.25rem, 5vw, 2rem)",
+          background: "linear-gradient(90deg, #7c3aed, #ec4899)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          minWidth: "4ch",
+          display: "inline-block",
+          textAlign: "center",
+        }}
+      >
+        {formatted}
+      </span>
+      <span
+        className="text-xs text-gray-400 tracking-widest uppercase"
+        style={{ fontFamily: "'Orbitron', sans-serif" }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+export default function Home({ onGoToLogin, onGoToRegister }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen flex flex-col" style={{ background: "#0d0d1a" }}>
+
+      {/* Fond radial */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -14,10 +64,9 @@ export default function Home({ onGoToLogin, onGoToRegister }) {
       />
 
       {/* ── NAVBAR ── */}
-      <nav className="relative z-10 flex items-center justify-between px-10 py-5">
-        {/* Logo */}
+      <nav className="relative z-20 flex items-center justify-between px-5 md:px-10 py-4">
         <span
-          className="text-xl font-black tracking-widest"
+          className="text-lg md:text-xl font-black tracking-widest shrink-0"
           style={{
             fontFamily: "'Orbitron', sans-serif",
             background: "linear-gradient(90deg, #7c3aed, #ec4899)",
@@ -29,81 +78,96 @@ export default function Home({ onGoToLogin, onGoToRegister }) {
           GAMEVIBE
         </span>
 
-        {/* Liens nav */}
-        <div className="flex items-center gap-8">
-          <a
-            href="#"
-            className="text-sm font-medium text-white border-b border-white pb-0.5"
-            style={{ fontFamily: "'Orbitron', sans-serif", letterSpacing: "0.05em" }}
-          >
-            Catalogue
-          </a>
-          <a
-            href="#"
-            className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-            style={{ fontFamily: "'Orbitron', sans-serif", letterSpacing: "0.05em" }}
-          >
-            Plateformes
-          </a>
-          <a
-            href="#"
-            className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-            style={{ fontFamily: "'Orbitron', sans-serif", letterSpacing: "0.05em" }}
-          >
-            Catégories
-          </a>
+        <div className="hidden md:flex items-center gap-8">
+          {["Catalogue", "Plateformes", "Catégories"].map((item, i) => (
+            <a
+              key={item}
+              href="#"
+              className={`text-sm font-medium transition-colors ${i === 0 ? "text-white border-b border-white pb-0.5" : "text-gray-400 hover:text-white"}`}
+              style={{ fontFamily: "'Orbitron', sans-serif", letterSpacing: "0.05em" }}
+            >
+              {item}
+            </a>
+          ))}
         </div>
 
-        {/* Boutons auth */}
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           <button
             onClick={onGoToLogin}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-purple-400 transition-all hover:bg-purple-400/10"
-            style={{
-              border: "1px solid #7c3aed",
-              fontFamily: "'Orbitron', sans-serif",
-              letterSpacing: "0.05em",
-            }}
+            style={{ border: "1px solid #7c3aed", fontFamily: "'Orbitron', sans-serif" }}
           >
             Connexion
           </button>
           <button
             onClick={onGoToRegister}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90"
-            style={{
-              background: "linear-gradient(90deg, #7c3aed, #ec4899)",
-              fontFamily: "'Orbitron', sans-serif",
-              letterSpacing: "0.05em",
-            }}
+            style={{ background: "linear-gradient(90deg, #7c3aed, #ec4899)", fontFamily: "'Orbitron', sans-serif" }}
           >
             S&apos;inscrire
           </button>
         </div>
+
+        {/* Mobile */}
+        <div className="flex md:hidden items-center gap-2">
+          <button
+            onClick={onGoToLogin}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-400"
+            style={{ border: "1px solid #7c3aed", fontFamily: "'Orbitron', sans-serif" }}
+          >
+            Connexion
+          </button>
+          <button
+            onClick={onGoToRegister}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
+            style={{ background: "linear-gradient(90deg, #7c3aed, #ec4899)", fontFamily: "'Orbitron', sans-serif" }}
+          >
+            S&apos;inscrire
+          </button>
+          <button onClick={() => setMenuOpen(!menuOpen)} className="ml-1 flex flex-col gap-1 p-1">
+            <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "rotate-45 translate-y-1.5" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "-rotate-45 -translate-y-1.5" : ""}`} />
+          </button>
+        </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 gap-8 -mt-10">
+      {/* Menu burger mobile */}
+      {menuOpen && (
+        <div
+          className="relative z-10 flex flex-col items-center gap-4 py-4 md:hidden"
+          style={{ background: "rgba(13,13,26,0.95)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          {["Catalogue", "Plateformes", "Catégories"].map((item) => (
+            <a key={item} href="#" className="text-sm font-medium text-gray-300 hover:text-white"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}>
+              {item}
+            </a>
+          ))}
+        </div>
+      )}
 
-        {/* Badge */}
+      {/* ── HERO ── */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-5 md:px-6 gap-6 md:gap-8 py-12 md:py-0">
+
         <div
           className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest text-gray-300 uppercase"
           style={{
             border: "1px solid rgba(255,255,255,0.15)",
             background: "rgba(255,255,255,0.05)",
             fontFamily: "'Orbitron', sans-serif",
-            letterSpacing: "0.15em",
+            letterSpacing: "0.12em",
           }}
         >
           <span>🎮</span>
           <span>Plateforme de notation</span>
         </div>
 
-        {/* Titre principal */}
         <h1
-          className="text-6xl font-black leading-tight max-w-3xl"
-          style={{ fontFamily: "'Orbitron', sans-serif" }}
+          className="font-black leading-tight"
+          style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "clamp(2rem, 7vw, 4rem)" }}
         >
-          <span className="text-white">Découvrez les<br />jeux</span>
+          <span className="text-white">Découvrez les jeux</span>
           <br />
           <span
             style={{
@@ -113,66 +177,48 @@ export default function Home({ onGoToLogin, onGoToRegister }) {
               backgroundClip: "text",
             }}
           >
-            appréciés par la<br />communauté
+            appréciés par la communauté
           </span>
         </h1>
 
-        {/* Sous-titre */}
-        <p className="text-gray-400 text-base max-w-lg">
+        <p className="text-gray-400 text-sm md:text-base max-w-md">
           Notez, commentez et explorez les meilleurs jeux vidéo selon les avis de vrais joueurs.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-row items-center gap-3 w-full max-w-md">
           <button
-            className="px-8 py-4 rounded-xl text-sm font-bold tracking-widest text-white uppercase transition-all hover:opacity-90 active:scale-95"
+            className="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-bold tracking-widest text-white uppercase transition-all hover:opacity-90 active:scale-95"
             style={{
               background: "linear-gradient(90deg, #7c3aed, #ec4899)",
               fontFamily: "'Orbitron', sans-serif",
-              letterSpacing: "0.12em",
+              letterSpacing: "0.08em",
             }}
           >
             Explorer le catalogue
           </button>
           <button
-            className="px-8 py-4 rounded-xl text-sm font-bold tracking-widest text-white uppercase transition-all hover:bg-white/10 active:scale-95"
+            onClick={onGoToRegister}
+            className="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-bold tracking-widest text-white uppercase transition-all hover:bg-white/10 active:scale-95"
             style={{
               border: "1px solid rgba(255,255,255,0.2)",
               background: "rgba(255,255,255,0.05)",
               fontFamily: "'Orbitron', sans-serif",
-              letterSpacing: "0.12em",
+              letterSpacing: "0.08em",
             }}
-            onClick={onGoToRegister}
           >
-            Rejoindre la communauté
+            Rejoindre
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-16 mt-4">
-          {[
-            { value: "1 240", label: "Jeux" },
-            { value: "8 500", label: "Avis" },
-            { value: "3 200", label: "Joueurs" },
-          ].map(({ value, label }) => (
-            <div key={label} className="flex flex-col items-center gap-1">
-              <span
-                className="text-3xl font-black"
-                style={{
-                  fontFamily: "'Orbitron', sans-serif",
-                  background: "linear-gradient(90deg, #7c3aed, #ec4899)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                {value}
-              </span>
-              <span className="text-xs text-gray-400 tracking-widest uppercase"
-                style={{ fontFamily: "'Orbitron', sans-serif" }}>
-                {label}
-              </span>
-            </div>
+        {/* ── STATS ANIMÉES ── */}
+        <div className="flex flex-row items-center justify-center gap-8 md:gap-16 mt-2">
+          {STATS.map(({ target, label }, i) => (
+            <AnimatedStat
+              key={label}
+              target={target}
+              label={label}
+              delay={i * 200} // chaque stat démarre 200ms après la précédente
+            />
           ))}
         </div>
       </main>

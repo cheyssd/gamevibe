@@ -182,3 +182,22 @@
     border-right-color: var(--border);
   }
 }
+
+/* Responsive tweaks for hero images */
+@media (max-width: 480px) {
+  .hero .base {
+    width: 120px;
+  }
+
+  .hero .framework {
+    top: 24px;
+    height: 22px;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg) scale(1.1);
+  }
+
+  .hero .vite {
+    top: 84px;
+    height: 20px;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg) scale(0.7);
+  }
+}
