@@ -69,7 +69,7 @@ export default function AdminJeux() {
     if (currentPageNum > lastPage) {
       setCurrentPage(Math.max(lastPage || 1, 1));
     }
-  }, [totalPages, currentPage, jeuxMeta]);
+  }, [totalPages, jeuxMeta.last_page]);
 
   useEffect(() => {
     fetchMeta();
