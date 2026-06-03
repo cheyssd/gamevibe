@@ -10,12 +10,6 @@ class JeuCollection extends ResourceCollection
     {
         return [
             'data' => $this->collection,
-            'meta' => [
-                'total' => $this->total(),
-                'par_page' => $this->perPage(),
-                'page_actuelle' => $this->currentPage(),
-                'derniere_page' => $this->lastPage(),
-            ],
         ];
     }
 }
