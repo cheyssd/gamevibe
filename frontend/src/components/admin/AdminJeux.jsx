@@ -42,7 +42,7 @@ const EMPTY_FORM = {
 };
 
 export default function AdminJeux() {
-  const PAGE_SIZE = 12;
+  const PAGE_SIZE = 10;
   const [jeux, setJeux] = useState([]);
   const [plateformes, setPlateformes] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -268,6 +268,7 @@ export default function AdminJeux() {
             <table className="w-full min-w-max">
               <thead>
                 <tr className="border-b border-white/5">
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">IMAGE</th>
                   <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">TITRE</th>
                   <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap hidden md:table-cell">PLATEFORMES</th>
                   <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap hidden lg:table-cell">CATÉGORIES</th>
@@ -285,6 +286,13 @@ export default function AdminJeux() {
                 ) : (
                   jeux.map((jeu) => (
                     <tr key={jeu.id} className="border-b border-white/3 hover:bg-white/2 transition-colors">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                        <img
+                          src={jeu.image || "https://via.placeholder.com/120x80?text=No+Image"}
+                          alt={jeu.titre}
+                          className="h-12 w-20 rounded-lg object-cover"
+                        />
+                      </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white whitespace-nowrap line-clamp-1">{jeu.titre}</td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
                         <div className="flex flex-wrap gap-1">
