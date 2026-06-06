@@ -1,39 +1,40 @@
 import { useState, useEffect } from "react";
+import Catalogue from "./components/Catalogue";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import FicheJeu from "./components/FicheJeu";
 import AdminLayout from "./components/admin/AdminLayout";
 
 export default function App() {
-  const [view, setView] = useState("home");
+  const [view, setView] = useState(() => {
+    return localStorage.getItem("currentView") || "home";
+  });
   const [user, setUser] = useState(null);
+  const [selectedJeuId, setSelectedJeuId] = useState(() => {
+    const saved = localStorage.getItem("selectedJeuId");
+    return saved ? Number(saved) : null;
+  });
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const hashView = window.location.hash.replace(/^#/, "");
-    const allowedViews = ["home", "login", "register", "admin"];
-    const initialView = allowedViews.includes(hashView) ? hashView : "home";
-
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
-      if (initialView === "home" && parsedUser.role === "admin") {
-        setView("admin");
-      } else {
-        setView(initialView);
+      // Si admin et pas déjà sur une page admin → rediriger
+      if (parsedUser.role === "admin" && !localStorage.getItem("currentView")?.startsWith("admin")) {
+        navigateTo("admin");
       }
-    } else {
-      setView(initialView);
     }
 
-    const targetHash = hashView.startsWith("admin") ? `#${hashView}` : `#${initialView}`;
-    window.history.replaceState({ view: initialView }, "GameVibe", targetHash);
+    window.history.replaceState({ view: localStorage.getItem("currentView") || "home" }, "GameVibe", window.location.href);
   }, []);
 
   useEffect(() => {
     const handlePopState = (event) => {
       if (event.state && event.state.view) {
         setView(event.state.view);
+        localStorage.setItem("currentView", event.state.view);
       }
     };
     window.addEventListener("popstate", handlePopState);
@@ -42,13 +43,12 @@ export default function App() {
 
   const navigateTo = (newView) => {
     setView(newView);
-    const hash = newView === "admin" ? "#admin" : `#${newView}`;
-    window.history.pushState({ view: newView }, "GameVibe", hash);
+    localStorage.setItem("currentView", newView);
+    window.history.pushState({ view: newView }, "GameVibe", window.location.href);
   };
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    // Si admin → espace admin, sinon → home
     if (userData.role === "admin") {
       navigateTo("admin");
     } else {
@@ -59,8 +59,11 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("currentView");
+    localStorage.removeItem("selectedJeuId");
     setUser(null);
-    navigateTo("home");
+    setView("home");
+    window.history.pushState({ view: "home" }, "GameVibe", window.location.href);
   };
 
   return (
@@ -71,6 +74,31 @@ export default function App() {
           onGoToLogin={() => navigateTo("login")}
           onGoToRegister={() => navigateTo("register")}
           onLogout={handleLogout}
+          onNavigate={navigateTo}
+        />
+      )}
+      {view === "catalogue" && (
+        <Catalogue
+          user={user}
+          onGoToLogin={() => navigateTo("login")}
+          onGoToRegister={() => navigateTo("register")}
+          onLogout={handleLogout}
+          onNavigate={navigateTo}
+          onSelectJeu={(id) => {
+            setSelectedJeuId(id);
+            localStorage.setItem("selectedJeuId", id);
+            navigateTo("fiche-jeu");
+          }}
+        />
+      )}
+      {view === "fiche-jeu" && (
+        <FicheJeu
+          jeuId={selectedJeuId}
+          user={user}
+          onGoToLogin={() => navigateTo("login")}
+          onGoToRegister={() => navigateTo("register")}
+          onLogout={handleLogout}
+          onNavigate={navigateTo}
         />
       )}
       {view === "login" && (
