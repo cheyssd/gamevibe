@@ -14,7 +14,12 @@ class AvisController extends Controller
     // Liste les avis d'un jeu (public)
     public function index(Jeu $jeu)
     {
-        $avis = $jeu->avis()->with('user')->latest()->paginate(10);
+        if (request()->boolean('all')) {
+            $avis = $jeu->avis()->with('user')->latest()->get();
+            return response()->json(['data' => AvisResource::collection($avis)]);
+        }
+        $avis = Avis::where('jeu_id', $jeu->id)->with('user')->latest()->paginate(10);
+
 
         return AvisResource::collection($avis);
     }

@@ -16,7 +16,8 @@ export default function AdminAvis() {
 
   const fetchJeux = async () => {
     try {
-      const res = await api.get("/jeux");
+      // all=true → tous les jeux sans pagination pour remplir le select
+      const res = await api.get("/jeux", { params: { all: true } });
       const jeuxData = res.data.data ?? [];
       setJeux(jeuxData);
       if (jeuxData.length > 0) setSelectedJeu(jeuxData[0].id);
@@ -55,7 +56,7 @@ export default function AdminAvis() {
         <h1 className="text-xl sm:text-2xl font-black text-white line-clamp-1" style={{ fontFamily: "'Orbitron', sans-serif" }}>
           Avis
         </h1>
-        <p className="text-gray-500 text-xs sm:text-sm mt-1 line-clamp-1">Voir et gérer les avis</p>
+        <p className="text-gray-500 text-xs sm:text-sm mt-1">Voir et gérer les avis</p>
       </div>
 
       {/* Sélecteur de jeu */}
@@ -90,7 +91,7 @@ export default function AdminAvis() {
               {avis.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-3 sm:px-4 py-4 sm:py-6 text-center text-gray-500 text-xs sm:text-sm">
-                    Aucun avis
+                    Aucun avis pour ce jeu
                   </td>
                 </tr>
               ) : (
@@ -104,21 +105,24 @@ export default function AdminAvis() {
                         <span className="text-xs sm:text-sm font-semibold text-white truncate">{a.user?.nom}</span>
                       </div>
                     </td>
-                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-yellow-400 text-xs sm:text-sm flex items-center gap-0.5 sm:gap-1 flex-shrink-0 whitespace-nowrap">
-                      {[...Array(5)].map((_, i) => (
-                        <i key={i} className={`bi ${i < a.note ? 'bi-star-fill' : 'bi-star'} text-xs sm:text-sm`}></i>
-                      ))}
-                      <span className="ml-1 text-xs text-gray-400 hidden sm:inline">({a.note})</span>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-yellow-400 text-xs sm:text-sm whitespace-nowrap">
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <i key={i} className={`bi ${i < a.note ? 'bi-star-fill' : 'bi-star'} text-xs sm:text-sm`}></i>
+                        ))}
+                        <span className="ml-1 text-xs text-gray-400 hidden sm:inline">({a.note})</span>
+                      </div>
                     </td>
                     <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-400 hidden md:table-cell max-w-xs truncate">
                       {a.commentaire}
                     </td>
-                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500 hidden lg:table-cell whitespace-nowrap">{a.cree_le}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500 hidden lg:table-cell whitespace-nowrap">
+                      {a.cree_le}
+                    </td>
                     <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
                       <button
                         onClick={() => handleDelete(selectedJeu, a.id)}
-                        className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-[32px] flex items-center justify-center gap-1"
-                        title="Supprimer"
+                        className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center justify-center gap-1"
                       >
                         <i className="bi bi-trash"></i>
                         <span className="hidden sm:inline">Supprimer</span>

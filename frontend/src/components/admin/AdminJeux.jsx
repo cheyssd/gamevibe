@@ -410,7 +410,7 @@ export default function AdminJeux() {
                           className="h-12 w-20 rounded-lg object-cover"
                         />
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white whitespace-nowrap line-clamp-1">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white max-w-[220px] truncate overflow-hidden">
                         {jeu.titre}
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 hidden md:table-cell">

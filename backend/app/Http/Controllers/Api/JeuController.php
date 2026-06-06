@@ -11,36 +11,39 @@ use App\Models\Jeu;
 
 class JeuController extends Controller
 {
-    // Liste tous les jeux (public)
     public function index()
     {
-        $jeux = Jeu::with(['developpeur', 'plateformes', 'categories'])
-            ->when(request('search'), function ($query) {
-                $query->where('titre', 'like', '%' . request('search') . '%');
-            })
-            ->when(request('plateforme_id'), function ($query) {
-                $query->whereHas('plateformes', function ($q) {
-                    $q->where('plateformes.id', request('plateforme_id'));
-                });
-            })
-            ->when(request('categorie_id'), function ($query) {
-                $query->whereHas('categories', function ($q) {
-                    $q->where('categories.id', request('categorie_id'));
-                });
-            })
-            ->paginate(request('per_page', 12));
+        $query = Jeu::with(['developpeur', 'plateformes', 'categories'])
+            ->when(request('search'), fn($q) =>
+                $q->where('titre', 'like', '%' . request('search') . '%')
+            )
+            ->when(request('plateforme_id'), fn($q) =>
+                $q->whereHas('plateformes', fn($q2) =>
+                    $q2->where('plateformes.id', request('plateforme_id'))
+                )
+            )
+            ->when(request('categorie_id'), fn($q) =>
+                $q->whereHas('categories', fn($q2) =>
+                    $q2->where('categories.id', request('categorie_id'))
+                )
+            )
+            ->orderBy('titre');
 
-        return new JeuCollection($jeux);
+        // ?all=true → liste complète pour les selects (ex: page avis admin)
+        if (request()->boolean('all')) {
+            $jeux = $query->get(['id', 'titre']); // on prend seulement id+titre, léger
+            return response()->json(['data' => $jeux]);
+        }
+
+        return new JeuCollection($query->paginate(12));
     }
 
-    // Voir un jeu (public)
     public function show(Jeu $jeu)
     {
         $jeu->load(['developpeur', 'plateformes', 'categories', 'avis.user']);
         return new JeuResource($jeu);
     }
 
-    // Ajouter un jeu (admin)
     public function store(StoreJeuRequest $request)
     {
         $jeu = Jeu::create($request->validated());
@@ -48,7 +51,6 @@ class JeuController extends Controller
         if ($request->has('plateformes')) {
             $jeu->plateformes()->sync($request->plateformes);
         }
-
         if ($request->has('categories')) {
             $jeu->categories()->sync($request->categories);
         }
@@ -59,7 +61,6 @@ class JeuController extends Controller
         ], 201);
     }
 
-    // Modifier un jeu (admin)
     public function update(UpdateJeuRequest $request, Jeu $jeu)
     {
         $jeu->update($request->validated());
@@ -67,7 +68,6 @@ class JeuController extends Controller
         if ($request->has('plateformes')) {
             $jeu->plateformes()->sync($request->plateformes);
         }
-
         if ($request->has('categories')) {
             $jeu->categories()->sync($request->categories);
         }
@@ -78,13 +78,9 @@ class JeuController extends Controller
         ]);
     }
 
-    // Supprimer un jeu (admin)
     public function destroy(Jeu $jeu)
     {
         $jeu->delete();
-
-        return response()->json([
-            'message' => 'Jeu supprimé avec succès'
-        ]);
+        return response()->json(['message' => 'Jeu supprimé avec succès']);
     }
 }
