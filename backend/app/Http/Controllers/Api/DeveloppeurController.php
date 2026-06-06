@@ -13,10 +13,9 @@ class DeveloppeurController extends Controller
     // Liste tous les développeurs (public)
     public function index()
     {
-        $developpeurs = Developpeur::all();
+        $developpeurs = Developpeur::paginate(10);
         return DeveloppeurResource::collection($developpeurs);
     }
-
     // Ajouter un développeur (admin)
     public function store(StoreDeveloppeurRequest $request)
     {

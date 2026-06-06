@@ -1,11 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useCountUp from "./useCountUp";
-
-const STATS = [
-  { target: 1240, label: "Jeux" },
-  { target: 8500, label: "Avis" },
-  { target: 3200, label: "Joueurs" },
-];
+import api from "../services/api";
 
 function AnimatedStat({ target, label, delay }) {
   const count = useCountUp(target, 2200, delay);
@@ -28,6 +23,29 @@ function AnimatedStat({ target, label, delay }) {
 
 export default function Home({ onGoToLogin, onGoToRegister, onLogout, user }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [stats, setStats] = useState({ totalJeux: 0, totalAvis: 0, totalUsers: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.get("/admin/stats");
+        setStats({
+          totalJeux: res.data.totalJeux ?? 0,
+          totalAvis: res.data.totalAvis ?? 0,
+          totalUsers: res.data.totalUsers ?? 0,
+        });
+      } catch (err) {
+        console.error("Erreur stats home", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const STATS = [
+    { target: stats.totalJeux, label: "Jeux" },
+    { target: stats.totalAvis, label: "Avis" },
+    { target: stats.totalUsers, label: "Joueurs" },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0d0d1a]">
@@ -49,8 +67,8 @@ export default function Home({ onGoToLogin, onGoToRegister, onLogout, user }) {
         {/* Liens desktop */}
         <div className="hidden md:flex items-center gap-8">
           {["Catalogue", "Plateformes", "Catégories"].map((item, i) => (
-            <a
-              key={item}
+            
+            <a  key={item}
               href="#"
               className={`text-sm font-medium cursor-pointer transition-colors ${
                 i === 0 ? "text-white border-b border-white pb-0.5" : "text-gray-400 hover:text-white"
@@ -132,8 +150,12 @@ export default function Home({ onGoToLogin, onGoToRegister, onLogout, user }) {
       {menuOpen && (
         <div className="relative z-10 flex flex-col items-center gap-4 py-4 md:hidden bg-[#0d0d1a]/95 border-b border-white/10">
           {["Catalogue", "Plateformes", "Catégories"].map((item) => (
-            <a key={item} href="#" className="text-sm font-medium text-gray-300 cursor-pointer hover:text-white transition-colors"
-              style={{ fontFamily: "'Orbitron', sans-serif" }}>
+            
+             <a key={item}
+              href="#"
+              className="text-sm font-medium text-gray-300 cursor-pointer hover:text-white transition-colors"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
+            >
               {item}
             </a>
           ))}
@@ -145,7 +167,12 @@ export default function Home({ onGoToLogin, onGoToRegister, onLogout, user }) {
 
         {user && (
           <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500/20 to-pink-500/20 border border-violet-500/30">
-            <span className="text-sm sm:text-base font-semibold text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>Bienvenue {user.nom} !</span>
+            <span
+              className="text-sm sm:text-base font-semibold text-white"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
+            >
+              Bienvenue {user.nom} !
+            </span>
           </div>
         )}
 
@@ -194,7 +221,7 @@ export default function Home({ onGoToLogin, onGoToRegister, onLogout, user }) {
           )}
         </div>
 
-        {/* Stats animées */}
+        {/* Stats animées avec vraies données */}
         <div className="flex flex-row items-center justify-center gap-8 md:gap-16 mt-2">
           {STATS.map(({ target, label }, i) => (
             <AnimatedStat key={label} target={target} label={label} delay={i * 200} />
@@ -204,9 +231,3 @@ export default function Home({ onGoToLogin, onGoToRegister, onLogout, user }) {
     </div>
   );
 }
-/* // Plus tard — données de l'API
-const STATS = [
-  { target: data.totalJeux, label: "Jeux" },
-  { target: data.totalAvis, label: "Avis" },
-  { target: data.totalJoueurs, label: "Joueurs" },
-]; */

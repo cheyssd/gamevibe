@@ -13,7 +13,7 @@ class PlateformeController extends Controller
     // Liste toutes les plateformes (public)
     public function index()
     {
-        $plateformes = Plateforme::all();
+        $plateformes = Plateforme::paginate(10);
         return PlateformeResource::collection($plateformes);
     }
 

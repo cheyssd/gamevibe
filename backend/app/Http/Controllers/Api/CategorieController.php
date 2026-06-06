@@ -13,7 +13,7 @@ class CategorieController extends Controller
     // Liste toutes les catégories (public)
     public function index()
     {
-        $categories = Categorie::all();
+        $categories = Categorie::paginate(10);
         return CategorieResource::collection($categories);
     }
 

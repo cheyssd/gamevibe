@@ -12,7 +12,7 @@ class UserController extends Controller
     // Liste tous les utilisateurs (admin)
     public function index()
     {
-        $users = User::paginate(20);
+        $users = User::paginate(10);
         return UserResource::collection($users);
     }
 

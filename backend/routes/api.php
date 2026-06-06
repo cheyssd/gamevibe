@@ -7,12 +7,13 @@ use App\Http\Controllers\Api\AvisController;
 use App\Http\Controllers\Api\CategorieController;
 use App\Http\Controllers\Api\PlateformeController;
 use App\Http\Controllers\Api\DeveloppeurController;
-use App\Http\Controllers\Api\AdminStatsController;
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\UserController;
 
 // ===== ROUTES PUBLIQUES =====
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/admin/stats', [AdminController::class, 'stats']);
 
 // Jeux (lecture publique)
 Route::get('/jeux', [JeuController::class, 'index']);
@@ -47,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/jeux/{jeu}/avis/{avis}', [AvisController::class, 'update']);
     Route::delete('/jeux/{jeu}/avis/{avis}', [AvisController::class, 'destroy']);
 
+
     // ===== ROUTES ADMIN =====
     Route::middleware('admin')->group(function () {
 
@@ -75,7 +77,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/{user}', [UserController::class, 'show']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
-        // Statistiques globales admin
-        Route::get('/admin/stats', [AdminStatsController::class, 'index']);
     });
 });
