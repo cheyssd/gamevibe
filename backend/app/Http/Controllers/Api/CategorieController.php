@@ -10,10 +10,14 @@ use App\Models\Categorie;
 
 class CategorieController extends Controller
 {
-    // Liste toutes les catégories (public)
     public function index()
     {
-        $categories = Categorie::paginate(10);
+        if (request()->boolean('all')) {
+            $categories = Categorie::orderBy('nom')->get();
+            return response()->json(['data' => CategorieResource::collection($categories)]);
+        }
+
+        $categories = Categorie::orderBy('nom')->paginate(10);
         return CategorieResource::collection($categories);
     }
 

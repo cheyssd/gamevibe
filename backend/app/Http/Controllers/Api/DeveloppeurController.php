@@ -10,10 +10,16 @@ use App\Models\Developpeur;
 
 class DeveloppeurController extends Controller
 {
-    // Liste tous les développeurs (public)
     public function index()
     {
-        $developpeurs = Developpeur::paginate(10);
+        // ?all=true → tout charger (pour les selects du formulaire)
+        // sans paramètre → paginé (pour la page de listing admin)
+        if (request()->boolean('all')) {
+            $developpeurs = Developpeur::orderBy('nom')->get();
+            return response()->json(['data' => DeveloppeurResource::collection($developpeurs)]);
+        }
+
+        $developpeurs = Developpeur::orderBy('nom')->paginate(10);
         return DeveloppeurResource::collection($developpeurs);
     }
     // Ajouter un développeur (admin)

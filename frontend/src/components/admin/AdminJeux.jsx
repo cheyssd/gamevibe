@@ -7,8 +7,18 @@ function Modal({ title, onClose, children }) {
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-2 sm:p-4">
       <div className="bg-[#1A1A2E] rounded-xl border border-violet-500/20 w-full max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 sticky top-0 bg-[#1A1A2E] z-10">
-          <h2 className="font-bold text-white text-sm sm:text-base line-clamp-1" style={{ fontFamily: "'Orbitron', sans-serif" }}>{title}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-lg sm:text-xl cursor-pointer shrink-0 ml-2 min-h-9 min-w-9 flex items-center justify-center"><i className="bi bi-x-lg"></i></button>
+          <h2
+            className="font-bold text-white text-sm sm:text-base line-clamp-1"
+            style={{ fontFamily: "'Orbitron', sans-serif" }}
+          >
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white text-lg sm:text-xl cursor-pointer shrink-0 ml-2 min-h-9 min-w-9 flex items-center justify-center"
+          >
+            <i className="bi bi-x-lg"></i>
+          </button>
         </div>
         <div className="p-4 sm:p-6">{children}</div>
       </div>
@@ -19,7 +29,9 @@ function Modal({ title, onClose, children }) {
 function InputField({ label, type = "text", value, onChange, placeholder }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-gray-400 uppercase tracking-widest">{label}</label>
+      <label className="text-xs text-gray-400 uppercase tracking-widest">
+        {label}
+      </label>
       <input
         type={type}
         value={value}
@@ -56,7 +68,11 @@ export default function AdminJeux() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalJeux, setTotalJeux] = useState(0);
-  const [jeuxMeta, setJeuxMeta] = useState({ total: 0, current_page: 1, last_page: 1 });
+  const [jeuxMeta, setJeuxMeta] = useState({
+    total: 0,
+    current_page: 1,
+    last_page: 1,
+  });
   const [error, setError] = useState(null);
   const [platformeFilter, setPlatformeFilter] = useState("");
   const [categorieFilter, setCategorieFilter] = useState("");
@@ -77,7 +93,12 @@ export default function AdminJeux() {
     fetchMeta();
   }, []);
 
-  const fetchJeux = async (page = 1, query = "", plateforme = "", categorie = "") => {
+  const fetchJeux = async (
+    page = 1,
+    query = "",
+    plateforme = "",
+    categorie = "",
+  ) => {
     setLoadingJeux(true);
     setError(null);
 
@@ -94,7 +115,8 @@ export default function AdminJeux() {
       // normalize meta (support FR/EN keys and provide fallbacks)
       const normalizedMeta = {
         total: Number(meta.total ?? fallbackTotal) || fallbackTotal,
-        current_page: Number(meta.page_actuelle ?? meta.current_page ?? page) || page,
+        current_page:
+          Number(meta.page_actuelle ?? meta.current_page ?? page) || page,
         last_page: Number(meta.derniere_page ?? meta.last_page ?? 1) || 1,
       };
 
@@ -105,7 +127,9 @@ export default function AdminJeux() {
       setCurrentPage(normalizedMeta.current_page);
     } catch (err) {
       console.error(err);
-      setError("Impossible de charger les jeux. Vérifiez la connexion ou l'API.");
+      setError(
+        "Impossible de charger les jeux. Vérifiez la connexion ou l'API.",
+      );
     } finally {
       setLoadingJeux(false);
     }
@@ -115,22 +139,37 @@ export default function AdminJeux() {
     setLoadingMeta(true);
     try {
       const [platRes, catRes, devRes] = await Promise.all([
-        api.get("/plateformes"),
-        api.get("/categories"),
-        api.get("/developpeurs"),
+        api.get("/plateformes", { params: { all: true } }),
+        api.get("/categories", { params: { all: true } }),
+        api.get("/developpeurs", { params: { all: true } }),
       ]);
 
-      setPlateformes(platRes.data.data ?? []);
-      setCategories(catRes.data.data ?? []);
-      setDeveloppeurs(devRes.data.data ?? []);
+      // Gère les deux formats possibles : { data: [...] } ou directement [...]
+      const extract = (res) => {
+        const raw = res.data;
+        if (Array.isArray(raw)) return raw;
+        if (Array.isArray(raw.data)) return raw.data;
+        return [];
+      };
+
+      const devs = extract(devRes);
+      // Tri alphabétique pour trouver facilement dans le select
+      devs.sort((a, b) => a.nom.localeCompare(b.nom));
+
+      setPlateformes(extract(platRes));
+      setCategories(extract(catRes));
+      setDeveloppeurs(devs);
+
+      console.log(`✅ ${devs.length} développeurs chargés`); // debug temporaire
     } catch (err) {
-      console.error(err);
+      console.error("Erreur fetchMeta :", err);
     } finally {
       setLoadingMeta(false);
     }
   };
 
-  const handle = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+  const handle = (field) => (e) =>
+    setForm({ ...form, [field]: e.target.value });
 
   const toggleArray = (field, id) => {
     const arr = form[field];
@@ -188,11 +227,20 @@ export default function AdminJeux() {
     }
   };
 
-  const currentPageNumber = Number(currentPage) || Number(jeuxMeta.current_page) || 1;
+  const currentPageNumber =
+    Number(currentPage) || Number(jeuxMeta.current_page) || 1;
   const totalJeuxNumber = Number(jeuxMeta.total) || Number(totalJeux) || 0;
   const lastPage = Number(jeuxMeta.last_page) || totalPages;
-  const displayedStart = totalJeuxNumber > 0 ? Math.min((currentPageNumber - 1) * PAGE_SIZE + 1, totalJeuxNumber) : (jeux.length > 0 ? 1 : 0);
-  const displayedEnd = totalJeuxNumber > 0 ? Math.min(currentPageNumber * PAGE_SIZE, totalJeuxNumber) : jeux.length;
+  const displayedStart =
+    totalJeuxNumber > 0
+      ? Math.min((currentPageNumber - 1) * PAGE_SIZE + 1, totalJeuxNumber)
+      : jeux.length > 0
+        ? 1
+        : 0;
+  const displayedEnd =
+    totalJeuxNumber > 0
+      ? Math.min(currentPageNumber * PAGE_SIZE, totalJeuxNumber)
+      : jeux.length;
 
   const getPaginationItems = () => {
     const pages = [];
@@ -205,7 +253,10 @@ export default function AdminJeux() {
     }
 
     const leftSiblingIndex = Math.max(currentPageNumber - siblingCount, 2);
-    const rightSiblingIndex = Math.min(currentPageNumber + siblingCount, totalPagesCount - 1);
+    const rightSiblingIndex = Math.min(
+      currentPageNumber + siblingCount,
+      totalPagesCount - 1,
+    );
 
     const shouldShowLeftDots = leftSiblingIndex > 2;
     const shouldShowRightDots = rightSiblingIndex < totalPagesCount - 1;
@@ -232,10 +283,15 @@ export default function AdminJeux() {
     <div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-black text-white line-clamp-1" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+          <h1
+            className="text-xl sm:text-2xl font-black text-white line-clamp-1"
+            style={{ fontFamily: "'Orbitron', sans-serif" }}
+          >
             Gestion des jeux
           </h1>
-          <p className="text-gray-500 text-xs sm:text-sm mt-1 line-clamp-1">Ajouter, modifier ou supprimer des jeux</p>
+          <p className="text-gray-500 text-xs sm:text-sm mt-1 line-clamp-1">
+            Ajouter, modifier ou supprimer des jeux
+          </p>
         </div>
         <button
           onClick={openAdd}
@@ -298,7 +354,9 @@ export default function AdminJeux() {
 
       <div className="bg-[#1A1A2E] rounded-xl border border-white/5 overflow-x-auto">
         {loadingJeux ? (
-          <div className="p-4 sm:p-6 text-gray-500 text-sm">Chargement des jeux...</div>
+          <div className="p-4 sm:p-6 text-gray-500 text-sm">
+            Chargement des jeux...
+          </div>
         ) : error ? (
           <div className="p-4 sm:p-6 text-red-400 text-sm">{error}</div>
         ) : (
@@ -306,47 +364,82 @@ export default function AdminJeux() {
             <table className="w-full min-w-max">
               <thead>
                 <tr className="border-b border-white/5">
-                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">IMAGE</th>
-                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">TITRE</th>
-                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap hidden md:table-cell">PLATEFORMES</th>
-                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap hidden lg:table-cell">CATÉGORIES</th>
-                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">NOTE</th>
-                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">ACTIONS</th>
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">
+                    IMAGE
+                  </th>
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">
+                    TITRE
+                  </th>
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap hidden md:table-cell">
+                    PLATEFORMES
+                  </th>
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap hidden lg:table-cell">
+                    CATÉGORIES
+                  </th>
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">
+                    NOTE
+                  </th>
+                  <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 tracking-widest uppercase whitespace-nowrap">
+                    ACTIONS
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {jeux.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-3 sm:px-4 py-4 sm:py-6 text-center text-gray-500 text-xs sm:text-sm">
+                    <td
+                      colSpan={5}
+                      className="px-3 sm:px-4 py-4 sm:py-6 text-center text-gray-500 text-xs sm:text-sm"
+                    >
                       Aucun jeu trouvé
                     </td>
                   </tr>
                 ) : (
                   jeux.map((jeu) => (
-                    <tr key={jeu.id} className="border-b border-white/3 hover:bg-white/2 transition-colors">
+                    <tr
+                      key={jeu.id}
+                      className="border-b border-white/3 hover:bg-white/2 transition-colors"
+                    >
                       <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
                         <img
-                          src={jeu.image || "https://via.placeholder.com/120x80?text=No+Image"}
+                          src={
+                            jeu.image ||
+                            "https://via.placeholder.com/120x80?text=No+Image"
+                          }
                           alt={jeu.titre}
                           className="h-12 w-20 rounded-lg object-cover"
                         />
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white whitespace-nowrap line-clamp-1">{jeu.titre}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white whitespace-nowrap line-clamp-1">
+                        {jeu.titre}
+                      </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {jeu.plateformes?.map((p) => (
-                            <span key={p.id} className="text-xs px-2 py-0.5 rounded bg-violet-500/15 text-violet-400 whitespace-nowrap">{p.nom}</span>
+                            <span
+                              key={p.id}
+                              className="text-xs px-2 py-0.5 rounded bg-violet-500/15 text-violet-400 whitespace-nowrap"
+                            >
+                              {p.nom}
+                            </span>
                           ))}
                         </div>
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 hidden lg:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {jeu.categories?.map((c) => (
-                            <span key={c.id} className="text-xs px-2 py-0.5 rounded bg-pink-500/15 text-pink-400 whitespace-nowrap">{c.nom}</span>
+                            <span
+                              key={c.id}
+                              className="text-xs px-2 py-0.5 rounded bg-pink-500/15 text-pink-400 whitespace-nowrap"
+                            >
+                              {c.nom}
+                            </span>
                           ))}
                         </div>
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-yellow-400 whitespace-nowrap shrink-0"><i className="bi bi-star-fill"></i> {jeu.note_moyenne}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-yellow-400 whitespace-nowrap shrink-0">
+                        <i className="bi bi-star-fill"></i> {jeu.note_moyenne}
+                      </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
                         <div className="flex gap-1 sm:gap-2">
                           <button
@@ -355,7 +448,9 @@ export default function AdminJeux() {
                             title="Modifier"
                           >
                             <i className="bi bi-pencil"></i>
-                            <span className="hidden sm:inline ml-1">Modifier</span>
+                            <span className="hidden sm:inline ml-1">
+                              Modifier
+                            </span>
                           </button>
                           <button
                             onClick={() => handleDelete(jeu.id)}
@@ -363,7 +458,9 @@ export default function AdminJeux() {
                             title="Supprimer"
                           >
                             <i className="bi bi-trash"></i>
-                            <span className="hidden sm:inline ml-1">Supprimer</span>
+                            <span className="hidden sm:inline ml-1">
+                              Supprimer
+                            </span>
                           </button>
                         </div>
                       </td>
@@ -376,18 +473,21 @@ export default function AdminJeux() {
             {lastPage > 1 && (
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-xs text-gray-400">
-                  Affichage {displayedStart} - {displayedEnd} sur {totalJeuxNumber} jeux
+                  Affichage {displayedStart} - {displayedEnd} sur{" "}
+                  {totalJeuxNumber} jeux
                 </div>
                 <div className="flex items-center gap-2 flex-wrap justify-end w-full sm:w-auto">
                   <button
                     type="button"
-                    onClick={() => setCurrentPage(Math.max(currentPageNumber - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage(Math.max(currentPageNumber - 1, 1))
+                    }
                     disabled={currentPageNumber === 1}
                     className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-white/5 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 transition-all"
                   >
                     Précédent
                   </button>
-                  {getPaginationItems().map((page) => (
+                  {getPaginationItems().map((page) =>
                     typeof page === "string" ? (
                       <span
                         key={page}
@@ -408,11 +508,13 @@ export default function AdminJeux() {
                       >
                         {page}
                       </button>
-                    )
-                  ))}
+                    ),
+                  )}
                   <button
                     type="button"
-                    onClick={() => setCurrentPage(Math.min(currentPageNumber + 1, lastPage))}
+                    onClick={() =>
+                      setCurrentPage(Math.min(currentPageNumber + 1, lastPage))
+                    }
                     disabled={currentPageNumber === lastPage}
                     className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-white/5 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 transition-all"
                   >
@@ -426,11 +528,21 @@ export default function AdminJeux() {
       </div>
 
       {modal && (
-        <Modal title={modal === "add" ? "Ajouter un jeu" : "Modifier le jeu"} onClose={() => setModal(null)}>
+        <Modal
+          title={modal === "add" ? "Ajouter un jeu" : "Modifier le jeu"}
+          onClose={() => setModal(null)}
+        >
           <div className="flex flex-col gap-4">
-            <InputField label="Titre" value={form.titre} onChange={handle("titre")} placeholder="Ex: Elden Ring" />
+            <InputField
+              label="Titre"
+              value={form.titre}
+              onChange={handle("titre")}
+              placeholder="Ex: Elden Ring"
+            />
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-400 uppercase tracking-widest">Description</label>
+              <label className="text-xs text-gray-400 uppercase tracking-widest">
+                Description
+              </label>
               <textarea
                 value={form.description}
                 onChange={handle("description")}
@@ -439,11 +551,23 @@ export default function AdminJeux() {
                 className="bg-[#0F0F1A] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-violet-500/50 resize-none"
               />
             </div>
-            <InputField label="Image (URL)" value={form.image} onChange={handle("image")} placeholder="https://..." />
-            <InputField label="Date de sortie" type="date" value={form.date_sortie} onChange={handle("date_sortie")} />
+            <InputField
+              label="Image (URL)"
+              value={form.image}
+              onChange={handle("image")}
+              placeholder="https://..."
+            />
+            <InputField
+              label="Date de sortie"
+              type="date"
+              value={form.date_sortie}
+              onChange={handle("date_sortie")}
+            />
 
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-400 uppercase tracking-widest">Développeur</label>
+              <label className="text-xs text-gray-400 uppercase tracking-widest">
+                Développeur
+              </label>
               <select
                 value={form.developpeur_id}
                 onChange={handle("developpeur_id")}
@@ -451,13 +575,17 @@ export default function AdminJeux() {
               >
                 <option value="">Sélectionner un développeur</option>
                 {developpeurs.map((d) => (
-                  <option key={d.id} value={d.id}>{d.nom}</option>
+                  <option key={d.id} value={d.id}>
+                    {d.nom}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-widest">Plateformes</label>
+              <label className="text-xs text-gray-400 uppercase tracking-widest">
+                Plateformes
+              </label>
               <div className="flex flex-wrap gap-2">
                 {plateformes.map((p) => (
                   <button
@@ -477,7 +605,9 @@ export default function AdminJeux() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-widest">Catégories</label>
+              <label className="text-xs text-gray-400 uppercase tracking-widest">
+                Catégories
+              </label>
               <div className="flex flex-wrap gap-2">
                 {categories.map((c) => (
                   <button
