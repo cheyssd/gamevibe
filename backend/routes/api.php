@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',          [AuthController::class, 'logout']);
     Route::put('/profile',          [AuthController::class, 'updateProfile']);
     Route::put('/password',         [AuthController::class, 'updatePassword']);
+    Route::delete('/account',         [AuthController::class, 'deleteAccount']);
 
     Route::get('/mes-avis',  [UserController::class, 'mesAvis']);
     Route::get('/mes-stats', [UserController::class, 'mesStats']);
@@ -59,9 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Users
         Route::get('/users',                      [UserController::class, 'index']);
-        Route::get('/users/avec-desactives',       [UserController::class, 'indexAvecDesactives']);
+        Route::get('/users/avec-desactives',       [UserController::class, 'indexAvecDesactives']); // ← nouveau
         Route::get('/users/{user}',               [UserController::class, 'show']);
         Route::delete('/users/{user}',            [UserController::class, 'destroy']);
-        Route::post('/users/{id}/restore',        [UserController::class, 'restore']);
+        Route::post('/users/{id}/restore',        [UserController::class, 'restore']);              // ← nouveau
     });
 });

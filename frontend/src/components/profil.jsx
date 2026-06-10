@@ -9,10 +9,16 @@ function Modal({ title, onClose, children }) {
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
       <div className="bg-[#1A1A2E] rounded-2xl border border-violet-500/20 w-full max-w-md">
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <h2 className="font-bold text-white text-sm" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+          <h2
+            className="font-bold text-white text-sm"
+            style={{ fontFamily: "'Orbitron', sans-serif" }}
+          >
             {title}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white cursor-pointer">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white cursor-pointer"
+          >
             <i className="bi bi-x-lg"></i>
           </button>
         </div>
@@ -25,7 +31,9 @@ function Modal({ title, onClose, children }) {
 function InputField({ label, type = "text", value, onChange, placeholder }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-gray-400 uppercase tracking-widest">{label}</label>
+      <label className="text-xs text-gray-400 uppercase tracking-widest">
+        {label}
+      </label>
       <input
         type={type}
         value={value}
@@ -52,7 +60,14 @@ function Stars({ note, interactive = false, onRate }) {
   );
 }
 
-export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, onNavigate, onUpdateUser }) {
+export default function Profil({
+  user,
+  onGoToLogin,
+  onGoToRegister,
+  onLogout,
+  onNavigate,
+  onUpdateUser,
+}) {
   const [stats, setStats] = useState(null);
   const [avis, setAvis] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +78,11 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
 
   // Formulaires
   const [profilForm, setProfilForm] = useState({ nom: user?.nom ?? "" });
-  const [passwordForm, setPasswordForm] = useState({ current_password: "", password: "", password_confirmation: "" });
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: "",
+    password: "",
+    password_confirmation: "",
+  });
   const [avisForm, setAvisForm] = useState({ note: 0, commentaire: "" });
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
@@ -98,9 +117,14 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
       localStorage.setItem("user", JSON.stringify(updated));
       onUpdateUser(updated);
       setFormSuccess("Profil mis à jour !");
-      setTimeout(() => { setModal(null); setFormSuccess(""); }, 1200);
+      setTimeout(() => {
+        setModal(null);
+        setFormSuccess("");
+      }, 1200);
     } catch (err) {
-      setFormError(err.response?.data?.message ?? "Erreur lors de la mise à jour");
+      setFormError(
+        err.response?.data?.message ?? "Erreur lors de la mise à jour",
+      );
     }
   };
 
@@ -115,9 +139,40 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
     try {
       await api.put("/password", passwordForm);
       setFormSuccess("Mot de passe modifié !");
-      setTimeout(() => { setModal(null); setFormSuccess(""); setPasswordForm({ current_password: "", password: "", password_confirmation: "" }); }, 1200);
+      setTimeout(() => {
+        setModal(null);
+        setFormSuccess("");
+        setPasswordForm({
+          current_password: "",
+          password: "",
+          password_confirmation: "",
+        });
+      }, 1200);
     } catch (err) {
       setFormError(err.response?.data?.message ?? "Erreur lors du changement");
+    }
+  };
+
+  // ── Supprimer son compte ──────────────────────────────────────────────────────
+  const handleDeleteAccount = async () => {
+    if (
+      !confirm(
+        "Supprimer définitivement votre compte ? Cette action est irréversible.",
+      )
+    )
+      return;
+    try {
+      await api.delete("/account");
+      // Nettoyer et déconnecter
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("currentView");
+      onLogout();
+    } catch (err) {
+      alert(
+        err.response?.data?.message ??
+          "Erreur lors de la suppression du compte.",
+      );
     }
   };
 
@@ -132,7 +187,10 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
   const handleUpdateAvis = async () => {
     setFormError("");
     try {
-      await api.put(`/jeux/${editingAvis.jeu.id}/avis/${editingAvis.id}`, avisForm);
+      await api.put(
+        `/jeux/${editingAvis.jeu.id}/avis/${editingAvis.id}`,
+        avisForm,
+      );
       setModal(null);
       fetchData();
     } catch (err) {
@@ -166,7 +224,6 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
       />
 
       <div className="max-w-3xl mx-auto px-4 py-8 flex flex-col gap-6">
-
         {/* ── CARTE PROFIL ── */}
         <div className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
           {/* Avatar */}
@@ -176,24 +233,46 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
 
           {/* Infos */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-black text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+            <h2
+              className="text-xl font-black text-white"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
+            >
               {user?.nom}
             </h2>
             <p className="text-sm text-gray-400 mt-0.5">{user?.email}</p>
             <div className="flex flex-wrap gap-2 mt-3">
               <button
-                onClick={() => { setProfilForm({ nom: user?.nom ?? "" }); setFormError(""); setModal("profil"); }}
+                onClick={() => {
+                  setProfilForm({ nom: user?.nom ?? "" });
+                  setFormError("");
+                  setModal("profil");
+                }}
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold text-violet-400 border border-violet-600 hover:bg-violet-400/10 transition-colors cursor-pointer"
                 style={{ fontFamily: "'Orbitron', sans-serif" }}
               >
                 Modifier le profil
               </button>
               <button
-                onClick={() => { setPasswordForm({ current_password: "", password: "", password_confirmation: "" }); setFormError(""); setModal("password"); }}
+                onClick={() => {
+                  setPasswordForm({
+                    current_password: "",
+                    password: "",
+                    password_confirmation: "",
+                  });
+                  setFormError("");
+                  setModal("password");
+                }}
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold text-pink-400 border border-pink-600 hover:bg-pink-400/10 transition-colors cursor-pointer"
                 style={{ fontFamily: "'Orbitron', sans-serif" }}
               >
                 Changer mot de passe
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 border border-red-600/50 hover:bg-red-400/10 transition-colors cursor-pointer"
+                style={{ fontFamily: "'Orbitron', sans-serif" }}
+              >
+                <i className="bi bi-trash mr-1"></i>Supprimer mon compte
               </button>
             </div>
           </div>
@@ -201,22 +280,36 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
 
         {/* ── STATS ── */}
         {loading ? (
-          <div className="text-gray-500 text-sm text-center py-4">Chargement...</div>
+          <div className="text-gray-500 text-sm text-center py-4">
+            Chargement...
+          </div>
         ) : (
           <div className="grid grid-cols-3 gap-4">
             {[
               { value: stats?.total_avis ?? 0, label: "Jeux notés" },
-              { value: stats?.note_moyenne ?? "—", label: "Note moyenne donnée" },
+              {
+                value: stats?.note_moyenne ?? "—",
+                label: "Note moyenne donnée",
+              },
               { value: stats?.genre_prefere ?? "—", label: "Genre préféré" },
             ].map(({ value, label }) => (
-              <div key={label} className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-5 flex flex-col items-center justify-center gap-2 text-center">
+              <div
+                key={label}
+                className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-5 flex flex-col items-center justify-center gap-2 text-center"
+              >
                 <span
                   className="font-black bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent"
-                  style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "clamp(1.5rem, 4vw, 2.5rem)" }}
+                  style={{
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
+                  }}
                 >
                   {value}
                 </span>
-                <span className="text-xs text-gray-500 uppercase tracking-widest" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+                <span
+                  className="text-xs text-gray-500 uppercase tracking-widest"
+                  style={{ fontFamily: "'Orbitron', sans-serif" }}
+                >
                   {label}
                 </span>
               </div>
@@ -226,7 +319,10 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
 
         {/* ── MES AVIS ── */}
         <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-black text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+          <h3
+            className="text-lg font-black text-white"
+            style={{ fontFamily: "'Orbitron', sans-serif" }}
+          >
             Mes avis postés
           </h3>
 
@@ -238,7 +334,10 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
             </div>
           ) : (
             avis.map((a) => (
-              <div key={a.id} className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-5 flex flex-col gap-3">
+              <div
+                key={a.id}
+                className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-5 flex flex-col gap-3"
+              >
                 {/* Header avis */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3">
@@ -246,15 +345,21 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
                       {initiale}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">{a.jeu?.titre ?? "Jeu inconnu"}</p>
+                      <p className="text-sm font-bold text-white">
+                        {a.jeu?.titre ?? "Jeu inconnu"}
+                      </p>
                       <Stars note={a.note} />
                     </div>
                   </div>
-                  <span className="text-xs text-gray-500 whitespace-nowrap shrink-0">{a.cree_le}</span>
+                  <span className="text-xs text-gray-500 whitespace-nowrap shrink-0">
+                    {a.cree_le}
+                  </span>
                 </div>
 
                 {/* Commentaire */}
-                <p className="text-sm text-gray-300 leading-relaxed">{a.commentaire}</p>
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  {a.commentaire}
+                </p>
 
                 {/* Actions */}
                 <div className="flex gap-2">
@@ -290,12 +395,20 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
               placeholder="Votre nom"
             />
             {formError && <p className="text-xs text-red-400">{formError}</p>}
-            {formSuccess && <p className="text-xs text-green-400">{formSuccess}</p>}
+            {formSuccess && (
+              <p className="text-xs text-green-400">{formSuccess}</p>
+            )}
             <div className="flex gap-2 mt-1">
-              <button onClick={handleUpdateProfil} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:opacity-90 cursor-pointer">
+              <button
+                onClick={handleUpdateProfil}
+                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:opacity-90 cursor-pointer"
+              >
                 Enregistrer
               </button>
-              <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-white/5 hover:bg-white/10 cursor-pointer">
+              <button
+                onClick={() => setModal(null)}
+                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-white/5 hover:bg-white/10 cursor-pointer"
+              >
                 Annuler
               </button>
             </div>
@@ -307,16 +420,54 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
       {modal === "password" && (
         <Modal title="Changer le mot de passe" onClose={() => setModal(null)}>
           <div className="flex flex-col gap-4">
-            <InputField label="Mot de passe actuel" type="password" value={passwordForm.current_password} onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })} placeholder="••••••••" />
-            <InputField label="Nouveau mot de passe" type="password" value={passwordForm.password} onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })} placeholder="••••••••" />
-            <InputField label="Confirmer" type="password" value={passwordForm.password_confirmation} onChange={(e) => setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })} placeholder="••••••••" />
+            <InputField
+              label="Mot de passe actuel"
+              type="password"
+              value={passwordForm.current_password}
+              onChange={(e) =>
+                setPasswordForm({
+                  ...passwordForm,
+                  current_password: e.target.value,
+                })
+              }
+              placeholder="••••••••"
+            />
+            <InputField
+              label="Nouveau mot de passe"
+              type="password"
+              value={passwordForm.password}
+              onChange={(e) =>
+                setPasswordForm({ ...passwordForm, password: e.target.value })
+              }
+              placeholder="••••••••"
+            />
+            <InputField
+              label="Confirmer"
+              type="password"
+              value={passwordForm.password_confirmation}
+              onChange={(e) =>
+                setPasswordForm({
+                  ...passwordForm,
+                  password_confirmation: e.target.value,
+                })
+              }
+              placeholder="••••••••"
+            />
             {formError && <p className="text-xs text-red-400">{formError}</p>}
-            {formSuccess && <p className="text-xs text-green-400">{formSuccess}</p>}
+            {formSuccess && (
+              <p className="text-xs text-green-400">{formSuccess}</p>
+            )}
             <div className="flex gap-2 mt-1">
-              <button onClick={handleUpdatePassword} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:opacity-90 cursor-pointer">
+              <button
+                onClick={handleUpdatePassword}
+                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:opacity-90 cursor-pointer"
+              >
                 Enregistrer
               </button>
-              <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-white/5 hover:bg-white/10 cursor-pointer">
+              <button
+                onClick={() => setModal(null)}
+                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-white/5 hover:bg-white/10 cursor-pointer"
+              >
                 Annuler
               </button>
             </div>
@@ -326,27 +477,46 @@ export default function Profil({ user, onGoToLogin, onGoToRegister, onLogout, on
 
       {/* ── MODAL MODIFIER AVIS ── */}
       {modal === "edit-avis" && (
-        <Modal title={`Modifier l'avis — ${editingAvis?.jeu?.titre}`} onClose={() => setModal(null)}>
+        <Modal
+          title={`Modifier l'avis — ${editingAvis?.jeu?.titre}`}
+          onClose={() => setModal(null)}
+        >
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-400 uppercase tracking-widest">Note</label>
-              <Stars note={avisForm.note} interactive onRate={(n) => setAvisForm({ ...avisForm, note: n })} />
+              <label className="text-xs text-gray-400 uppercase tracking-widest">
+                Note
+              </label>
+              <Stars
+                note={avisForm.note}
+                interactive
+                onRate={(n) => setAvisForm({ ...avisForm, note: n })}
+              />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-400 uppercase tracking-widest">Commentaire</label>
+              <label className="text-xs text-gray-400 uppercase tracking-widest">
+                Commentaire
+              </label>
               <textarea
                 value={avisForm.commentaire}
-                onChange={(e) => setAvisForm({ ...avisForm, commentaire: e.target.value })}
+                onChange={(e) =>
+                  setAvisForm({ ...avisForm, commentaire: e.target.value })
+                }
                 rows={4}
                 className="bg-[#0F0F1A] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-violet-500/50 resize-none"
               />
             </div>
             {formError && <p className="text-xs text-red-400">{formError}</p>}
             <div className="flex gap-2 mt-1">
-              <button onClick={handleUpdateAvis} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:opacity-90 cursor-pointer">
+              <button
+                onClick={handleUpdateAvis}
+                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:opacity-90 cursor-pointer"
+              >
                 Enregistrer
               </button>
-              <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-white/5 hover:bg-white/10 cursor-pointer">
+              <button
+                onClick={() => setModal(null)}
+                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-white/5 hover:bg-white/10 cursor-pointer"
+              >
                 Annuler
               </button>
             </div>
