@@ -4,12 +4,11 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import FicheJeu from "./components/FicheJeu";
+import Profil from "./components/Profil";
 import AdminLayout from "./components/admin/AdminLayout";
 
 export default function App() {
-  const [view, setView] = useState(() => {
-    return localStorage.getItem("currentView") || "home";
-  });
+  const [view, setView] = useState(() => localStorage.getItem("currentView") || "home");
   const [user, setUser] = useState(null);
   const [selectedJeuId, setSelectedJeuId] = useState(() => {
     const saved = localStorage.getItem("selectedJeuId");
@@ -21,18 +20,13 @@ export default function App() {
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
-      // Si admin et pas déjà sur une page admin → rediriger
-      if (parsedUser.role === "admin" && !localStorage.getItem("currentView")?.startsWith("admin")) {
-        navigateTo("admin");
-      }
     }
-
     window.history.replaceState({ view: localStorage.getItem("currentView") || "home" }, "GameVibe", window.location.href);
   }, []);
 
   useEffect(() => {
     const handlePopState = (event) => {
-      if (event.state && event.state.view) {
+      if (event.state?.view) {
         setView(event.state.view);
         localStorage.setItem("currentView", event.state.view);
       }
@@ -49,11 +43,7 @@ export default function App() {
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    if (userData.role === "admin") {
-      navigateTo("admin");
-    } else {
-      navigateTo("home");
-    }
+    navigateTo(userData.role === "admin" ? "admin" : "home");
   };
 
   const handleLogout = () => {
@@ -66,65 +56,35 @@ export default function App() {
     window.history.pushState({ view: "home" }, "GameVibe", window.location.href);
   };
 
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
+  const commonProps = {
+    user,
+    onGoToLogin:    () => navigateTo("login"),
+    onGoToRegister: () => navigateTo("register"),
+    onLogout:       handleLogout,
+    onNavigate:     navigateTo,
+  };
+
   return (
     <>
-      {view === "home" && (
-        <Home
-          user={user}
-          onGoToLogin={() => navigateTo("login")}
-          onGoToRegister={() => navigateTo("register")}
-          onLogout={handleLogout}
-          onNavigate={navigateTo}
-        />
-      )}
-      {view === "catalogue" && (
-        <Catalogue
-          user={user}
-          onGoToLogin={() => navigateTo("login")}
-          onGoToRegister={() => navigateTo("register")}
-          onLogout={handleLogout}
-          onNavigate={navigateTo}
-          onSelectJeu={(id) => {
-            setSelectedJeuId(id);
-            localStorage.setItem("selectedJeuId", id);
-            navigateTo("fiche-jeu");
-          }}
-        />
-      )}
-      {view === "fiche-jeu" && (
-        <FicheJeu
-          jeuId={selectedJeuId}
-          user={user}
-          onGoToLogin={() => navigateTo("login")}
-          onGoToRegister={() => navigateTo("register")}
-          onLogout={handleLogout}
-          onNavigate={navigateTo}
-        />
-      )}
-      {view === "login" && (
+      {view === "home"      && <Home      {...commonProps} />}
+      {view === "catalogue" && <Catalogue {...commonProps} onSelectJeu={(id) => { setSelectedJeuId(id); localStorage.setItem("selectedJeuId", id); navigateTo("fiche-jeu"); }} />}
+      {view === "fiche-jeu" && <FicheJeu  {...commonProps} jeuId={selectedJeuId} />}
+      {view === "profil"    && <Profil    {...commonProps} onUpdateUser={handleUpdateUser} />}
+      {view === "login"     && (
         <div className="min-h-screen flex items-center justify-center" style={{ background: "#0d0d1a" }}>
-          <Login
-            onSwitchToRegister={() => navigateTo("register")}
-            onGoHome={() => navigateTo("home")}
-            onLoginSuccess={handleLoginSuccess}
-          />
+          <Login onSwitchToRegister={() => navigateTo("register")} onGoHome={() => navigateTo("home")} onLoginSuccess={handleLoginSuccess} />
         </div>
       )}
-      {view === "register" && (
+      {view === "register"  && (
         <div className="min-h-screen flex items-center justify-center" style={{ background: "#0d0d1a" }}>
-          <Register
-            onSwitchToLogin={() => navigateTo("login")}
-            onGoHome={() => navigateTo("home")}
-            onLoginSuccess={handleLoginSuccess}
-          />
+          <Register onSwitchToLogin={() => navigateTo("login")} onGoHome={() => navigateTo("home")} onLoginSuccess={handleLoginSuccess} />
         </div>
       )}
-      {view === "admin" && (
-        <AdminLayout
-          user={user}
-          onLogout={handleLogout}
-        />
-      )}
+      {view === "admin"     && <AdminLayout user={user} onLogout={handleLogout} onNavigate={navigateTo} />}
     </>
   );
 }

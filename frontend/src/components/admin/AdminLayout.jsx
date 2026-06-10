@@ -9,16 +9,16 @@ import AdminUsers from "./AdminUsers";
 import AdminAvis from "./AdminAvis";
 
 const MENU = [
-  { key: "dashboard", label: "Dashboard", icon: "bi-graph-up" },
-  { key: "jeux", label: "Jeux", icon: "bi-joystick" },
-  { key: "plateformes", label: "Plateformes", icon: "bi-pc-display" },
-  { key: "categories", label: "Catégories", icon: "bi-tag-fill" },
-  { key: "developpeurs", label: "Développeurs", icon: "bi-person-fill" },
-  { key: "users", label: "Utilisateurs", icon: "bi-people-fill" },
-  { key: "avis", label: "Avis", icon: "bi-chat-left-fill" },
+  { key: "dashboard",    label: "Dashboard",      icon: "bi-graph-up" },
+  { key: "jeux",         label: "Jeux",           icon: "bi-joystick" },
+  { key: "plateformes",  label: "Plateformes",    icon: "bi-pc-display" },
+  { key: "categories",   label: "Catégories",     icon: "bi-tag-fill" },
+  { key: "developpeurs", label: "Développeurs",   icon: "bi-person-fill" },
+  { key: "users",        label: "Utilisateurs",   icon: "bi-people-fill" },
+  { key: "avis",         label: "Avis",           icon: "bi-chat-left-fill" },
 ];
 
-export default function AdminLayout({ user, onLogout }) {
+export default function AdminLayout({ user, onLogout, onNavigate }) {
   const [activePage, setActivePage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -31,24 +31,17 @@ export default function AdminLayout({ user, onLogout }) {
         return;
       }
     }
-
     const savedPage = localStorage.getItem("adminActivePage");
     if (savedPage && MENU.some((item) => item.key === savedPage)) {
       setActivePage(savedPage);
     }
   }, []);
 
-  const renderPage = () => {
-    switch (activePage) {
-      case "dashboard": return <AdminDashboard />;
-      case "jeux": return <AdminJeux />;
-      case "plateformes": return <AdminPlateformes />;
-      case "categories": return <AdminCategories />;
-      case "developpeurs": return <AdminDeveloppeurs />;
-      case "users": return <AdminUsers />;
-      case "avis": return <AdminAvis />;
-      default: return <AdminDashboard />;
-    }
+  const goTo = (key) => {
+    setActivePage(key);
+    localStorage.setItem("adminActivePage", key);
+    window.history.pushState({ view: "admin" }, "GameVibe", `#admin/${key}`);
+    setSidebarOpen(false);
   };
 
   return (
@@ -56,10 +49,7 @@ export default function AdminLayout({ user, onLogout }) {
 
       {/* Overlay mobile */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 z-20 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ── SIDEBAR ── */}
@@ -73,12 +63,12 @@ export default function AdminLayout({ user, onLogout }) {
         {/* Logo */}
         <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-violet-500/10 flex-shrink-0">
           <span
-            className="text-sm sm:text-lg font-black tracking-widest bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent line-clamp-1"
+            className="text-sm sm:text-lg font-black tracking-widest bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent"
             style={{ fontFamily: "'Orbitron', sans-serif" }}
           >
             GAMEVIBE
           </span>
-          <div className="text-xs text-gray-500 mt-1 tracking-widest uppercase line-clamp-1">Admin</div>
+          <div className="text-xs text-gray-500 mt-1 tracking-widest uppercase">Admin</div>
         </div>
 
         {/* Menu */}
@@ -86,15 +76,10 @@ export default function AdminLayout({ user, onLogout }) {
           {MENU.map((item) => (
             <button
               key={item.key}
-              onClick={() => {
-                setActivePage(item.key);
-                localStorage.setItem("adminActivePage", item.key);
-                window.history.pushState({ view: "admin" }, "GameVibe", `#admin/${item.key}`);
-                setSidebarOpen(false);
-              }}
+              onClick={() => goTo(item.key)}
               className={`
                 flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium
-                transition-all cursor-pointer text-left w-full min-h-[40px] sm:min-h-auto
+                transition-all cursor-pointer text-left w-full min-h-[40px]
                 ${activePage === item.key
                   ? "bg-violet-500/15 text-white border-l-2 border-violet-500"
                   : "text-gray-400 hover:bg-white/5 hover:text-white"
@@ -102,10 +87,21 @@ export default function AdminLayout({ user, onLogout }) {
               `}
             >
               <i className={`bi ${item.icon} text-sm sm:text-base flex-shrink-0`}></i>
-              <span className="line-clamp-1 sm:block hidden">{item.label}</span>
-              <span className="line-clamp-1 sm:hidden">{item.label.split(' ')[0]}</span>
+              <span className="line-clamp-1">{item.label}</span>
             </button>
           ))}
+
+          {/* Séparateur */}
+          <div className="border-t border-white/5 my-2" />
+
+          {/* ── VOIR LE SITE ── */}
+          <button
+            onClick={() => onNavigate("home")}
+            className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all cursor-pointer text-left w-full min-h-[40px]"
+          >
+            <i className="bi bi-box-arrow-up-right text-sm sm:text-base flex-shrink-0"></i>
+            <span>Voir le site</span>
+          </button>
         </nav>
 
         {/* User + Déconnexion */}
@@ -115,16 +111,16 @@ export default function AdminLayout({ user, onLogout }) {
               {user?.nom?.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <div className="text-xs sm:text-sm font-semibold text-white line-clamp-1">{user?.nom}</div>
-              <div className="text-xs text-gray-500 line-clamp-1">Admin</div>
+              <div className="text-xs sm:text-sm font-semibold text-white truncate">{user?.nom}</div>
+              <div className="text-xs text-gray-500">Admin</div>
             </div>
           </div>
           <button
             onClick={onLogout}
-            className="w-full py-2 rounded-lg text-xs font-semibold text-red-400 border border-red-500/30 hover:bg-red-500/10 transition-colors cursor-pointer min-h-[36px]"
+            className="w-full py-2 rounded-lg text-xs font-semibold text-red-400 border border-red-500/30 hover:bg-red-500/10 transition-colors cursor-pointer"
             style={{ fontFamily: "'Orbitron', sans-serif" }}
           >
-            Déco
+            <i className="bi bi-box-arrow-right mr-1"></i>Déconnexion
           </button>
         </div>
       </aside>
@@ -140,22 +136,31 @@ export default function AdminLayout({ user, onLogout }) {
           >
             GAMEVIBE
           </span>
-          <button onClick={() => setSidebarOpen(true)} className="flex flex-col gap-1 p-1 cursor-pointer">
-            <span className="block w-5 h-0.5 bg-white" />
-            <span className="block w-5 h-0.5 bg-white" />
-            <span className="block w-5 h-0.5 bg-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Bouton site sur mobile aussi */}
+            <button
+              onClick={() => onNavigate("home")}
+              className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded border border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <i className="bi bi-box-arrow-up-right"></i>
+            </button>
+            <button onClick={() => setSidebarOpen(true)} className="flex flex-col gap-1 p-1 cursor-pointer">
+              <span className="block w-5 h-0.5 bg-white" />
+              <span className="block w-5 h-0.5 bg-white" />
+              <span className="block w-5 h-0.5 bg-white" />
+            </button>
+          </div>
         </header>
 
         {/* Page active */}
         <main className="flex-1 p-2 sm:p-4 md:p-8 overflow-y-auto">
-          {activePage === "dashboard" && <AdminDashboard onNavigate={setActivePage} />}
-          {activePage === "jeux" && <AdminJeux />}
-          {activePage === "plateformes" && <AdminPlateformes />}
-          {activePage === "categories" && <AdminCategories />}
+          {activePage === "dashboard"    && <AdminDashboard onNavigate={setActivePage} />}
+          {activePage === "jeux"         && <AdminJeux />}
+          {activePage === "plateformes"  && <AdminPlateformes />}
+          {activePage === "categories"   && <AdminCategories />}
           {activePage === "developpeurs" && <AdminDeveloppeurs />}
-          {activePage === "users" && <AdminUsers />}
-          {activePage === "avis" && <AdminAvis />}
+          {activePage === "users"        && <AdminUsers />}
+          {activePage === "avis"         && <AdminAvis />}
         </main>
       </div>
     </div>

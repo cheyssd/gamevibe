@@ -390,20 +390,31 @@ export default function FicheJeu({ jeuId, user, onGoToLogin, onGoToRegister, onL
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-gray-500 text-xs">{a.cree_le}</span>
-                          {user && a.user?.id === user.id && (
+                          {user && (
                             <div className="flex gap-1">
-                              <button
-                                onClick={() => openEdit(a)}
-                                className="text-xs px-2 py-1 rounded-lg bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 cursor-pointer transition-colors"
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteAvis(a.id)}
-                                className="text-xs px-2 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors"
-                              >
-                                <i className="bi bi-trash"></i>
-                              </button>
+                              {/* Modifier — seulement l'auteur */}
+                              {a.user?.id === user.id && (
+                                <button
+                                  onClick={() => openEdit(a)}
+                                  className="text-xs px-2 py-1 rounded-lg bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 cursor-pointer transition-colors"
+                                  title="Modifier mon avis"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              )}
+                              {/* Supprimer — auteur OU admin */}
+                              {(a.user?.id === user.id || user.role === "admin") && (
+                                <button
+                                  onClick={() => handleDeleteAvis(a.id)}
+                                  className="text-xs px-2 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors"
+                                  title={user.role === "admin" && a.user?.id !== user.id ? "Supprimer (admin)" : "Supprimer mon avis"}
+                                >
+                                  <i className="bi bi-trash"></i>
+                                  {user.role === "admin" && a.user?.id !== user.id && (
+                                    <span className="ml-1 text-xs hidden sm:inline">Admin</span>
+                                  )}
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>

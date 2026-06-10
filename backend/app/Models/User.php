@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,8 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-   use HasApiTokens, Notifiable, HasFactory;
-
+    use HasApiTokens, Notifiable, HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -48,11 +48,17 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'deleted_at'        => 'datetime',
         ];
     }
 
     public function avis(): HasMany
     {
         return $this->hasMany(Avis::class);
+    }
+
+    public function isDesactive(): bool
+    {
+        return $this->trashed();
     }
 }

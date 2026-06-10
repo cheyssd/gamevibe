@@ -5,7 +5,7 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
   const [menuOpen, setMenuOpen] = useState(false);
 
   const NAV_LINKS = [
-    { label: "Accueil", page: "home" },
+    { label: "Accueil",   page: "home" },
     { label: "Catalogue", page: "catalogue" },
   ];
 
@@ -28,9 +28,7 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
             key={item.page}
             onClick={() => onNavigate(item.page)}
             className={`text-sm font-medium cursor-pointer transition-colors ${
-              activePage === item.page
-                ? "text-white border-b border-white pb-0.5"
-                : "text-gray-400 hover:text-white"
+              activePage === item.page ? "text-white border-b border-white pb-0.5" : "text-gray-400 hover:text-white"
             }`}
             style={{ fontFamily: "'Orbitron', sans-serif", letterSpacing: "0.05em" }}
           >
@@ -40,18 +38,40 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
       </div>
 
       {/* Boutons desktop */}
-      <div className="hidden md:flex items-center gap-4">
+      <div className="hidden md:flex items-center gap-3">
         {user ? (
           <>
-            <span
-              className="text-sm font-semibold text-gray-300"
+            {/* Bouton Dashboard — admin seulement */}
+            {user.role === "admin" && (
+              <button
+                onClick={() => onNavigate("admin")}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-yellow-400 border border-yellow-500/50 hover:bg-yellow-400/10 transition-colors cursor-pointer flex items-center gap-1.5"
+                style={{ fontFamily: "'Orbitron', sans-serif" }}
+              >
+                <i className="bi bi-speedometer2"></i>
+                Dashboard
+              </button>
+            )}
+
+            {/* Avatar → profil */}
+            <button
+              onClick={() => onNavigate("profil")}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                activePage === "profil"
+                  ? "text-white bg-violet-500/20 border border-violet-500/50"
+                  : "text-gray-300 hover:text-white hover:bg-white/5"
+              }`}
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
-              <i className="bi bi-person-circle mr-1"></i>{user.nom}
-            </span>
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                {user.nom?.charAt(0).toUpperCase()}
+              </div>
+              {user.nom}
+            </button>
+
             <button
               onClick={onLogout}
-              className="px-5 py-2 rounded-lg text-sm font-semibold text-red-400 border border-red-500 cursor-pointer hover:bg-red-400/10 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-semibold text-red-400 border border-red-500 cursor-pointer hover:bg-red-400/10 transition-colors"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
               <i className="bi bi-box-arrow-right mr-1"></i>Déconnexion
@@ -61,14 +81,14 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
           <>
             <button
               onClick={onGoToLogin}
-              className="px-5 py-2 rounded-lg text-sm font-semibold text-violet-400 border border-violet-600 cursor-pointer hover:bg-violet-400/10 hover:border-violet-500 transition-colors"
+              className="px-5 py-2 rounded-lg text-sm font-semibold text-violet-400 border border-violet-600 cursor-pointer hover:bg-violet-400/10 transition-colors"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
               Connexion
             </button>
             <button
               onClick={onGoToRegister}
-              className="px-5 py-2 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-pink-500 cursor-pointer hover:opacity-90 hover:shadow-lg hover:shadow-violet-500/50 transition-opacity"
+              className="px-5 py-2 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-pink-500 cursor-pointer hover:opacity-90 transition-opacity"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
               S&apos;inscrire
@@ -77,30 +97,39 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
         )}
       </div>
 
-      {/* Burger mobile */}
+      {/* Mobile */}
       <div className="flex md:hidden items-center gap-2">
         {user ? (
-          <button
-            onClick={onLogout}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 border border-red-500 cursor-pointer hover:bg-red-400/10 transition-colors"
-            style={{ fontFamily: "'Orbitron', sans-serif" }}
-          >
-            <i className="bi bi-box-arrow-right"></i>
-          </button>
-        ) : (
           <>
+            {user.role === "admin" && (
+              <button
+                onClick={() => onNavigate("admin")}
+                className="px-2 py-1.5 rounded-lg text-xs text-yellow-400 border border-yellow-500/50 cursor-pointer"
+                style={{ fontFamily: "'Orbitron', sans-serif" }}
+              >
+                <i className="bi bi-speedometer2"></i>
+              </button>
+            )}
             <button
-              onClick={onGoToLogin}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-violet-400 border border-violet-600 cursor-pointer hover:bg-violet-400/10 transition-colors"
-              style={{ fontFamily: "'Orbitron', sans-serif" }}
+              onClick={() => onNavigate("profil")}
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-sm font-bold text-white cursor-pointer"
             >
-              Connexion
+              {user.nom?.charAt(0).toUpperCase()}
             </button>
             <button
-              onClick={onGoToRegister}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-pink-500 cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={onLogout}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 border border-red-500 cursor-pointer"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
+              <i className="bi bi-box-arrow-right"></i>
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={onGoToLogin} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-violet-400 border border-violet-600 cursor-pointer" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+              Connexion
+            </button>
+            <button onClick={onGoToRegister} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-pink-500 cursor-pointer" style={{ fontFamily: "'Orbitron', sans-serif" }}>
               S&apos;inscrire
             </button>
           </>
@@ -119,18 +148,23 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
             <button
               key={item.page}
               onClick={() => { onNavigate(item.page); setMenuOpen(false); }}
-              className={`text-sm font-medium cursor-pointer transition-colors ${
-                activePage === item.page ? "text-white" : "text-gray-300 hover:text-white"
-              }`}
+              className={`text-sm font-medium cursor-pointer transition-colors ${activePage === item.page ? "text-white" : "text-gray-300 hover:text-white"}`}
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
               {item.label}
             </button>
           ))}
           {user && (
-            <span className="text-sm text-gray-400" style={{ fontFamily: "'Orbitron', sans-serif" }}>
-              <i className="bi bi-person-circle mr-1"></i>{user.nom}
-            </span>
+            <>
+              <button onClick={() => { onNavigate("profil"); setMenuOpen(false); }} className="text-sm text-violet-400 cursor-pointer" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+                <i className="bi bi-person-circle mr-1"></i>Mon profil
+              </button>
+              {user.role === "admin" && (
+                <button onClick={() => { onNavigate("admin"); setMenuOpen(false); }} className="text-sm text-yellow-400 cursor-pointer" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+                  <i className="bi bi-speedometer2 mr-1"></i>Dashboard
+                </button>
+              )}
+            </>
           )}
         </div>
       )}
