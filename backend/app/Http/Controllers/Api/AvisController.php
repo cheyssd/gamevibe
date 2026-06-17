@@ -20,14 +20,31 @@ class AvisController extends Controller
         }
         $avis = Avis::where('jeu_id', $jeu->id)->with('user')->latest()->paginate(10);
 
-
         return AvisResource::collection($avis);
+    }
+
+    // Liste TOUS les avis, tous jeux confondus, paginé + filtrable (admin)
+    public function indexAdmin()
+    {
+        $query = Avis::with(['user', 'jeu'])
+            ->when(request('jeu_id'), fn ($q) => $q->where('jeu_id', request('jeu_id')))
+            ->latest();
+
+        $avis = $query->paginate(10);
+
+        return AvisResource::collection($avis)->additional([
+            'meta' => [
+                'total'          => $avis->total(),
+                'par_page'       => $avis->perPage(),
+                'page_actuelle'  => $avis->currentPage(),
+                'derniere_page'  => $avis->lastPage(),
+            ],
+        ]);
     }
 
     // Poster un avis (connecté)
     public function store(StoreAvisRequest $request, Jeu $jeu)
     {
-        // Vérifier si l'utilisateur a déjà posté un avis sur ce jeu
         $existingAvis = Avis::where('user_id', $request->user()->id)
             ->where('jeu_id', $jeu->id)
             ->first();
@@ -39,27 +56,25 @@ class AvisController extends Controller
         }
 
         $avis = Avis::create([
-            'user_id' => $request->user()->id,
-            'jeu_id' => $jeu->id,
-            'note' => $request->note,
+            'user_id'     => $request->user()->id,
+            'jeu_id'      => $jeu->id,
+            'note'        => $request->note,
             'commentaire' => $request->commentaire,
         ]);
 
-        // Recalculer la note moyenne du jeu
         $jeu->update([
             'note_moyenne' => $jeu->avis()->avg('note')
         ]);
 
         return response()->json([
             'message' => 'Avis posté avec succès',
-            'avis' => new AvisResource($avis->load('user'))
+            'avis'    => new AvisResource($avis->load('user'))
         ], 201);
     }
 
     // Modifier un avis (connecté - propriétaire uniquement)
     public function update(UpdateAvisRequest $request, Jeu $jeu, Avis $avis)
     {
-        // Vérifier que l'utilisateur est le propriétaire
         if ($request->user()->id !== $avis->user_id) {
             return response()->json([
                 'message' => 'Action non autorisée'
@@ -67,18 +82,17 @@ class AvisController extends Controller
         }
 
         $avis->update([
-            'note' => $request->note ?? $avis->note,
+            'note'        => $request->note ?? $avis->note,
             'commentaire' => $request->commentaire ?? $avis->commentaire,
         ]);
 
-        // Recalculer la note moyenne du jeu
         $jeu->update([
             'note_moyenne' => $jeu->avis()->avg('note')
         ]);
 
         return response()->json([
             'message' => 'Avis modifié avec succès',
-            'avis' => new AvisResource($avis->load('user'))
+            'avis'    => new AvisResource($avis->load('user'))
         ]);
     }
 
@@ -87,7 +101,6 @@ class AvisController extends Controller
     {
         $user = request()->user();
 
-        // Vérifier que l'utilisateur est le propriétaire ou admin
         if ($user->id !== $avis->user_id && $user->role !== 'admin') {
             return response()->json([
                 'message' => 'Action non autorisée'
@@ -96,7 +109,6 @@ class AvisController extends Controller
 
         $avis->delete();
 
-        // Recalculer la note moyenne du jeu
         $jeu->update([
             'note_moyenne' => $jeu->avis()->avg('note') ?? 0
         ]);

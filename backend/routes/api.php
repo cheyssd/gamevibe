@@ -30,39 +30,46 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',          [AuthController::class, 'logout']);
     Route::put('/profile',          [AuthController::class, 'updateProfile']);
     Route::put('/password',         [AuthController::class, 'updatePassword']);
-    Route::delete('/account',         [AuthController::class, 'deleteAccount']);
+    Route::delete('/account',       [AuthController::class, 'deleteAccount']);
 
     Route::get('/mes-avis',  [UserController::class, 'mesAvis']);
     Route::get('/mes-stats', [UserController::class, 'mesStats']);
 
-    Route::post('/jeux/{jeu}/avis',              [AvisController::class, 'store']);
-    Route::put('/jeux/{jeu}/avis/{avis}',        [AvisController::class, 'update']);
-    Route::delete('/jeux/{jeu}/avis/{avis}',     [AvisController::class, 'destroy']);
+    Route::post('/jeux/{jeu}/avis',          [AvisController::class, 'store']);
+    Route::put('/jeux/{jeu}/avis/{avis}',    [AvisController::class, 'update']);
+    Route::delete('/jeux/{jeu}/avis/{avis}', [AvisController::class, 'destroy']);
 
     // ===== ROUTES ADMIN =====
     Route::middleware('admin')->group(function () {
 
-        Route::post('/jeux',          [JeuController::class, 'store']);
-        Route::put('/jeux/{jeu}',     [JeuController::class, 'update']);
-        Route::delete('/jeux/{jeu}',  [JeuController::class, 'destroy']);
+        // Avis (admin) — vue globale paginée et filtrable par jeu
+        Route::get('/avis', [AvisController::class, 'indexAdmin']);
 
-        Route::post('/categories',              [CategorieController::class, 'store']);
-        Route::put('/categories/{categorie}',   [CategorieController::class, 'update']);
-        Route::delete('/categories/{categorie}',[CategorieController::class, 'destroy']);
+        // Jeux (admin)
+        Route::post('/jeux',         [JeuController::class, 'store']);
+        Route::put('/jeux/{jeu}',    [JeuController::class, 'update']);
+        Route::delete('/jeux/{jeu}', [JeuController::class, 'destroy']);
 
-        Route::post('/plateformes',             [PlateformeController::class, 'store']);
-        Route::put('/plateformes/{plateforme}', [PlateformeController::class, 'update']);
-        Route::delete('/plateformes/{plateforme}',[PlateformeController::class, 'destroy']);
+        // Catégories (admin)
+        Route::post('/categories',               [CategorieController::class, 'store']);
+        Route::put('/categories/{categorie}',     [CategorieController::class, 'update']);
+        Route::delete('/categories/{categorie}',  [CategorieController::class, 'destroy']);
 
-        Route::post('/developpeurs',              [DeveloppeurController::class, 'store']);
-        Route::put('/developpeurs/{developpeur}', [DeveloppeurController::class, 'update']);
-        Route::delete('/developpeurs/{developpeur}',[DeveloppeurController::class, 'destroy']);
+        // Plateformes (admin)
+        Route::post('/plateformes',                [PlateformeController::class, 'store']);
+        Route::put('/plateformes/{plateforme}',    [PlateformeController::class, 'update']);
+        Route::delete('/plateformes/{plateforme}', [PlateformeController::class, 'destroy']);
 
-        // Users
-        Route::get('/users',                      [UserController::class, 'index']);
-        Route::get('/users/avec-desactives',       [UserController::class, 'indexAvecDesactives']); // ← nouveau
-        Route::get('/users/{user}',               [UserController::class, 'show']);
-        Route::delete('/users/{user}',            [UserController::class, 'destroy']);
-        Route::post('/users/{id}/restore',        [UserController::class, 'restore']);              // ← nouveau
+        // Développeurs (admin)
+        Route::post('/developpeurs',                 [DeveloppeurController::class, 'store']);
+        Route::put('/developpeurs/{developpeur}',     [DeveloppeurController::class, 'update']);
+        Route::delete('/developpeurs/{developpeur}',  [DeveloppeurController::class, 'destroy']);
+
+        // Utilisateurs (admin)
+        Route::get('/users',                 [UserController::class, 'index']);
+        Route::get('/users/avec-desactives', [UserController::class, 'indexAvecDesactives']);
+        Route::get('/users/{user}',          [UserController::class, 'show']);
+        Route::delete('/users/{user}',       [UserController::class, 'destroy']);
+        Route::post('/users/{id}/restore',   [UserController::class, 'restore']);
     });
 });
