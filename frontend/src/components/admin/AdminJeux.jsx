@@ -186,11 +186,18 @@ export default function AdminJeux() {
   };
 
   const openEdit = (jeu) => {
+    // Convertir dd/mm/yyyy → yyyy-mm-dd pour l'input date
+    let dateSortie = jeu.date_sortie ?? "";
+    if (dateSortie && dateSortie.includes("/")) {
+      const [day, month, year] = dateSortie.split("/");
+      dateSortie = `${year}-${month}-${day}`;
+    }
+
     setForm({
       titre: jeu.titre,
       description: jeu.description,
       image: jeu.image ?? "",
-      date_sortie: jeu.date_sortie,
+      date_sortie: dateSortie,
       developpeur_id: jeu.developpeur?.id ?? "",
       plateformes: jeu.plateformes?.map((p) => p.id) ?? [],
       categories: jeu.categories?.map((c) => c.id) ?? [],
@@ -500,11 +507,10 @@ export default function AdminJeux() {
                         key={page}
                         type="button"
                         onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                          page === currentPageNumber
+                        className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${page === currentPageNumber
                             ? "bg-violet-500 text-white"
                             : "bg-white/5 text-gray-300 hover:bg-white/10"
-                        }`}
+                          }`}
                       >
                         {page}
                       </button>
@@ -592,11 +598,10 @@ export default function AdminJeux() {
                     key={p.id}
                     onClick={() => toggleArray("plateformes", p.id)}
                     type="button"
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                      form.plateformes.includes(p.id)
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${form.plateformes.includes(p.id)
                         ? "bg-violet-500/20 border-violet-500 text-violet-300"
                         : "bg-white/5 border-white/10 text-gray-400"
-                    }`}
+                      }`}
                   >
                     {p.nom}
                   </button>
@@ -614,11 +619,10 @@ export default function AdminJeux() {
                     key={c.id}
                     onClick={() => toggleArray("categories", c.id)}
                     type="button"
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                      form.categories.includes(c.id)
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${form.categories.includes(c.id)
                         ? "bg-pink-500/20 border-pink-500 text-pink-300"
                         : "bg-white/5 border-white/10 text-gray-400"
-                    }`}
+                      }`}
                   >
                     {c.nom}
                   </button>

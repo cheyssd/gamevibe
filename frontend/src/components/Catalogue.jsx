@@ -258,7 +258,7 @@ export default function Catalogue({ user, onGoToLogin, onGoToRegister, onLogout,
                   <h3 className="font-bold text-white text-sm mb-2 line-clamp-1">{jeu.titre}</h3>
                   <div className="flex items-center gap-1 mb-2">
                     {renderStars(jeu.note_moyenne)}
-                    <span className="text-gray-500 text-xs ml-1">({jeu.avis?.length ?? 0})</span>
+                    {/* <span className="text-gray-500 text-xs ml-1">({jeu.avis?.length ?? 0})</span> */}
                   </div>
                   <div className="flex flex-wrap gap-1 mb-2">
                     {jeu.plateformes?.slice(0, 3).map((p) => (
