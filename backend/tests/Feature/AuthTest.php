@@ -45,7 +45,7 @@ class AuthTest extends TestCase
 
     public function test_l_inscription_echoue_si_mots_de_passe_ne_correspondent_pas(): void
     {
-        $response = $this->postJson('/api/register', [
+        $response = $this->postJson('/api/register', [ 
             'nom' => 'Konan',
             'email' => 'konan@gamevibe.com',
             'mot_de_passe' => 'password123',

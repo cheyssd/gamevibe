@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+
+  # ── Base de données ──
+  database:
+    image: mysql:8.0
+    container_name: gamevibe_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: gamevibe
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: gamevibe_user
+      MYSQL_PASSWORD: gamevibe_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - gamevibe_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: gamevibe_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: database
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    networks:
+      - gamevibe_network
+
+
+  # ── Backend Laravel ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gamevibe_backend
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www
+      - /var/www/vendor
+    environment:
+      DB_HOST: database
+      DB_DATABASE: gamevibe
+      DB_USERNAME: gamevibe_user
+      DB_PASSWORD: gamevibe_pass
+    depends_on:
+      - database
+    ports:
+      - "8000:8000"
+    networks:
+      - gamevibe_network
+
+  # ── Frontend React (mode dev avec hot-reload) ──
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: gamevibe_frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - "3000:3000"
+    networks:
+      - gamevibe_network
+
+  # ── Nginx (reverse proxy principal) ──
+  nginx:
+    image: nginx:alpine
+    container_name: gamevibe_nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - gamevibe_network
+
+networks:
+  gamevibe_network:
+    driver: bridge
+
+volumes:
+  db_data:
