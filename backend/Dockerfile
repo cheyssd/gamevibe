@@ -9,11 +9,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN echo "opcache.enable=1\nopcache.memory_consumption=128\nopcache.max_accelerated_files=10000\nopcache.revalidate_freq=0" \
-    > /usr/local/etc/php/conf.d/opcache.ini
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -22,10 +19,14 @@ WORKDIR /var/www
 
 COPY . .
 
+# Installation des dépendances AU BUILD (avec les outils de dev : Pail, Collision...)
+RUN composer install --optimize-autoloader
+
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
     && chmod -R 755 /var/www/bootstrap/cache
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "composer install --optimize-autoloader && php artisan key:generate --no-interaction || true && php artisan migrate --seed --force && php artisan serve --host=0.0.0.0 --port=8000"]
+# Au démarrage : juste générer la clé si absente, migrer (le --seed se fait à part, manuellement)
+CMD ["sh", "-c", "php artisan key:generate --no-interaction --force || true && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
