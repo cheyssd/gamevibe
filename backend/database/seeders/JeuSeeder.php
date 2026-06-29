@@ -372,13 +372,15 @@ class JeuSeeder extends Seeder
         foreach ($jeux as $jeuData) {
             $devel = Developpeur::firstOrCreate(['nom' => $jeuData['developpeur']]);
 
-            $jeu = Jeu::create([
-                'titre'          => $jeuData['titre'],
-                'description'    => $jeuData['description'],
-                'image'          => $jeuData['image'],
-                'date_sortie'    => $this->normalizeDate($jeuData['date_sortie']),
-                'developpeur_id' => $devel->id,
-            ]);
+            $jeu = Jeu::firstOrCreate(
+                ['titre' => $jeuData['titre']],
+                [
+                    'description'    => $jeuData['description'],
+                    'image'          => $jeuData['image'],
+                    'date_sortie'    => $this->normalizeDate($jeuData['date_sortie']),
+                    'developpeur_id' => $devel->id,
+                ]
+            );
 
             $jeu->plateformes()->sync(
                 collect($jeuData['plateformes'])->map(fn ($nom) => $plateformes[strtolower($nom)]->id)->all()
