@@ -10,7 +10,7 @@ use App\Models\Plateforme;
 
 class PlateformeController extends Controller
 {
-    // Liste toutes les plateformes (public)
+
     public function index()
     {
         if (request()->boolean('all')) {
@@ -22,7 +22,7 @@ class PlateformeController extends Controller
         return PlateformeResource::collection($plateformes);
     }
 
-    // Ajouter une plateforme (admin)
+
     public function store(StorePlateformeRequest $request)
     {
         $plateforme = Plateforme::create($request->validated());
@@ -33,7 +33,7 @@ class PlateformeController extends Controller
         ], 201);
     }
 
-    // Modifier une plateforme (admin)
+
     public function update(UpdatePlateformeRequest $request, Plateforme $plateforme)
     {
         $plateforme->update($request->validated());
@@ -44,7 +44,7 @@ class PlateformeController extends Controller
         ]);
     }
 
-    // Supprimer une plateforme (admin)
+
     public function destroy(Plateforme $plateforme)
     {
         $plateforme->delete();
