@@ -57,11 +57,13 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Déployer le backend
-        run: railway up --service gamevibe
+        run: railway up --service gamevibe --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
       - name: Déployer le frontend
-        run: railway up --service remarkable-generosity
+        run: railway up --service remarkable-generosity --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
