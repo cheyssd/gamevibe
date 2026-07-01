@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-// Configuration du test
+
 export const options = {
   stages: [
     { duration: '30s', target: 10 },  // Montée progressive à 10 utilisateurs

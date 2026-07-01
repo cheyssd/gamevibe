@@ -28,5 +28,4 @@ RUN chown -R www-data:www-data /var/www \
 
 EXPOSE 8000
 
-# Au démarrage : juste générer la clé si absente, migrer (le --seed se fait à part, manuellement)
 CMD ["sh", "-c", "php artisan key:generate --no-interaction --force || true && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
