@@ -21,7 +21,7 @@ class CategorieController extends Controller
         return CategorieResource::collection($categories);
     }
 
-    // Ajouter une catégorie (admin)
+
     public function store(StoreCategorieRequest $request)
     {
         $categorie = Categorie::create($request->validated());
@@ -32,7 +32,7 @@ class CategorieController extends Controller
         ], 201);
     }
 
-    // Modifier une catégorie (admin)
+
     public function update(UpdateCategorieRequest $request, Categorie $categorie)
     {
         $categorie->update($request->validated());
@@ -43,7 +43,7 @@ class CategorieController extends Controller
         ]);
     }
 
-    // Supprimer une catégorie (admin)
+
     public function destroy(Categorie $categorie)
     {
         $categorie->delete();

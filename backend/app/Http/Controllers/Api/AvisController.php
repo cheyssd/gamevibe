@@ -11,7 +11,7 @@ use App\Models\Jeu;
 
 class AvisController extends Controller
 {
-    // Liste les avis d'un jeu (public)
+
     public function index(Jeu $jeu)
     {
         if (request()->boolean('all')) {
@@ -23,7 +23,7 @@ class AvisController extends Controller
         return AvisResource::collection($avis);
     }
 
-    // Liste TOUS les avis, tous jeux confondus, paginé + filtrable (admin)
+
     public function indexAdmin()
     {
         $query = Avis::with(['user', 'jeu'])
@@ -42,7 +42,7 @@ class AvisController extends Controller
         ]);
     }
 
-    // Poster un avis (connecté)
+
     public function store(StoreAvisRequest $request, Jeu $jeu)
     {
         $existingAvis = Avis::where('user_id', $request->user()->id)
@@ -96,7 +96,7 @@ class AvisController extends Controller
         ]);
     }
 
-    // Supprimer un avis (connecté - propriétaire ou admin)
+
     public function destroy(Jeu $jeu, Avis $avis)
     {
         $user = request()->user();

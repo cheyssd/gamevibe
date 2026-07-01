@@ -29,9 +29,9 @@ class JeuController extends Controller
             )
             ->orderBy('titre');
 
-        // ?all=true → liste complète pour les selects (ex: page avis admin)
+
         if (request()->boolean('all')) {
-            $jeux = $query->get(['id', 'titre']); // on prend seulement id+titre, léger
+            $jeux = $query->get(['id', 'titre']);
             return response()->json(['data' => $jeux]);
         }
 

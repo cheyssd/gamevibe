@@ -32,21 +32,21 @@ class UserController extends Controller
     public function restore(int $id)
     {
         $user = User::withTrashed()->findOrFail($id);
-        $user->restore(); 
+        $user->restore();
 
         return response()->json([
             'message' => 'Compte réactivé avec succès'
         ]);
     }
 
-    // Liste tous les utilisateurs y compris désactivés (admin)
+
     public function indexAvecDesactives()
     {
         $users = User::withTrashed()->paginate(10);
         return UserResource::collection($users);
     }
 
-    // Voir ses propres avis (connecté)
+
     public function mesAvis()
     {
         $user = request()->user();
@@ -54,7 +54,7 @@ class UserController extends Controller
         return AvisResource::collection($avis);
     }
 
-    // Voir ses statistiques (connecté)
+
     public function mesStats()
     {
         $user = request()->user();

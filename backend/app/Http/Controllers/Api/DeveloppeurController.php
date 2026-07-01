@@ -12,8 +12,7 @@ class DeveloppeurController extends Controller
 {
     public function index()
     {
-        // ?all=true → tout charger (pour les selects du formulaire)
-        // sans paramètre → paginé (pour la page de listing admin)
+
         if (request()->boolean('all')) {
             $developpeurs = Developpeur::orderBy('nom')->get();
             return response()->json(['data' => DeveloppeurResource::collection($developpeurs)]);
@@ -22,7 +21,7 @@ class DeveloppeurController extends Controller
         $developpeurs = Developpeur::orderBy('nom')->paginate(10);
         return DeveloppeurResource::collection($developpeurs);
     }
-    // Ajouter un développeur (admin)
+
     public function store(StoreDeveloppeurRequest $request)
     {
         $developpeur = Developpeur::create($request->validated());
@@ -33,7 +32,7 @@ class DeveloppeurController extends Controller
         ], 201);
     }
 
-    // Modifier un développeur (admin)
+
     public function update(UpdateDeveloppeurRequest $request, Developpeur $developpeur)
     {
         $developpeur->update($request->validated());
@@ -44,7 +43,7 @@ class DeveloppeurController extends Controller
         ]);
     }
 
-    // Supprimer un développeur (admin)
+
     public function destroy(Developpeur $developpeur)
     {
         $developpeur->delete();
