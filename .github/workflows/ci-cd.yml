@@ -15,3 +15,25 @@ jobs:
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v4
+
+
+      - name: Installer PHP 8.2
+        runs-on: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extension: pdo, pdo_mysql, mbstring, bcmath, gd, pcntl, exif
+          coverage: pcov
+
+      - name: Installer les dépendances Composer
+        working-directory: backend
+        run: composer install --optimize-autoloader --no-interaction
+
+
+      - name: Copier le fichier .env de test
+        working-directory: backend
+        run: cp .env.example .env
+
+      - name: Générer la clé Laravel
+        working-directory: backend
+        run: php artisan key:generate
+        
