@@ -9,7 +9,7 @@ class AvisResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
             'note' => $this->note,
             'commentaire' => $this->commentaire,
             'user' => new UserResource($this->whenLoaded('user')),

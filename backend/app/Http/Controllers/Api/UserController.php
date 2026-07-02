@@ -29,9 +29,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function restore(int $id)
+    public function restore(string $uuid)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->where('uuid', $uuid)->firstOrFail();
         $user->restore();
 
         return response()->json([

@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Developpeur;
+use App\Models\Concerns\HasUuid;
 
 class Jeu extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $table = 'jeux';
 

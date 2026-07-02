@@ -13,7 +13,6 @@ use App\Http\Controllers\Api\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
-Route::get('/admin/stats', [AdminController::class, 'stats']);
 
 Route::get('/jeux',        [JeuController::class, 'index']);
 Route::get('/jeux/{jeu}',  [JeuController::class, 'show']);
@@ -42,6 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ROUTES ADMIN
     Route::middleware('admin')->group(function () {
 
+        Route::get('/admin/stats', [AdminController::class, 'stats']);
+
         Route::get('/avis', [AvisController::class, 'indexAdmin']);
 
         Route::post('/jeux',         [JeuController::class, 'store']);
@@ -64,6 +65,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/avec-desactives', [UserController::class, 'indexAvecDesactives']);
         Route::get('/users/{user}',          [UserController::class, 'show']);
         Route::delete('/users/{user}',       [UserController::class, 'destroy']);
-        Route::post('/users/{id}/restore',   [UserController::class, 'restore']);
+        Route::post('/users/{uuid}/restore', [UserController::class, 'restore']);
     });
 });

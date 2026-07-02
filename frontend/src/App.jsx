@@ -11,8 +11,7 @@ export default function App() {
   const [view, setView] = useState(() => localStorage.getItem("currentView") || "home");
   const [user, setUser] = useState(null);
   const [selectedJeuId, setSelectedJeuId] = useState(() => {
-    const saved = localStorage.getItem("selectedJeuId");
-    return saved ? Number(saved) : null;
+    return localStorage.getItem("selectedJeuId") || null;
   });
 
   useEffect(() => {

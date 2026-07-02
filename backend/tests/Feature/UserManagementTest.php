@@ -47,7 +47,7 @@ class UserManagementTest extends TestCase
         $token = $admin->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->deleteJson("/api/users/{$user->id}");
+            ->deleteJson("/api/users/{$user->uuid}");
 
         $response->assertStatus(200);
         $this->assertSoftDeleted('users', ['id' => $user->id]);

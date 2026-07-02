@@ -70,7 +70,7 @@ class ReferentielsTest extends TestCase
         $token = $this->adminToken();
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->deleteJson("/api/categories/{$categorie->id}");
+            ->deleteJson("/api/categories/{$categorie->uuid}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('categories', ['id' => $categorie->id]);
@@ -105,7 +105,7 @@ class ReferentielsTest extends TestCase
         $token = $this->adminToken();
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->putJson("/api/plateformes/{$plateforme->id}", ['nom' => 'PS5']);
+            ->putJson("/api/plateformes/{$plateforme->uuid}", ['nom' => 'PS5']);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('plateformes', ['id' => $plateforme->id, 'nom' => 'PS5']);
@@ -140,7 +140,7 @@ class ReferentielsTest extends TestCase
         $token = $this->adminToken();
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->deleteJson("/api/developpeurs/{$developpeur->id}");
+            ->deleteJson("/api/developpeurs/{$developpeur->uuid}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('developpeurs', ['id' => $developpeur->id]);

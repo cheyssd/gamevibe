@@ -30,10 +30,10 @@ class JeuTest extends TestCase
         $developpeur = Developpeur::factory()->create();
         $jeu = Jeu::factory()->create(['developpeur_id' => $developpeur->id]);
 
-        $response = $this->getJson("/api/jeux/{$jeu->id}");
+        $response = $this->getJson("/api/jeux/{$jeu->uuid}");
 
         $response->assertStatus(200)
-            ->assertJsonPath('data.id', $jeu->id)
+            ->assertJsonPath('data.id', $jeu->uuid)
             ->assertJsonPath('data.titre', $jeu->titre);
     }
 
@@ -62,9 +62,9 @@ class JeuTest extends TestCase
                 'titre' => 'Elden Ring',
                 'description' => 'Un RPG en monde ouvert',
                 'date_sortie' => '2022-02-25',
-                'developpeur_id' => $developpeur->id,
-                'plateformes' => [$plateforme->id],
-                'categories' => [$categorie->id],
+                'developpeur_id' => $developpeur->uuid,
+                'plateformes' => [$plateforme->uuid],
+                'categories' => [$categorie->uuid],
             ]);
 
         $response->assertStatus(201);
@@ -112,7 +112,7 @@ class JeuTest extends TestCase
         $token = $admin->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->putJson("/api/jeux/{$jeu->id}", [
+            ->putJson("/api/jeux/{$jeu->uuid}", [
                 'titre' => 'Nouveau titre',
             ]);
 
@@ -128,7 +128,7 @@ class JeuTest extends TestCase
         $token = $admin->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->deleteJson("/api/jeux/{$jeu->id}");
+            ->deleteJson("/api/jeux/{$jeu->uuid}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('jeux', ['id' => $jeu->id]);

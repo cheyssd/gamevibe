@@ -8,6 +8,9 @@ use App\Http\Requests\Jeu\UpdateJeuRequest;
 use App\Http\Resources\JeuResource;
 use App\Http\Resources\JeuCollection;
 use App\Models\Jeu;
+use App\Models\Categorie;
+use App\Models\Developpeur;
+use App\Models\Plateforme;
 
 class JeuController extends Controller
 {
@@ -19,19 +22,21 @@ class JeuController extends Controller
             )
             ->when(request('plateforme_id'), fn($q) =>
                 $q->whereHas('plateformes', fn($q2) =>
-                    $q2->where('plateformes.id', request('plateforme_id'))
+                    $q2->where('plateformes.uuid', request('plateforme_id'))
                 )
             )
             ->when(request('categorie_id'), fn($q) =>
                 $q->whereHas('categories', fn($q2) =>
-                    $q2->where('categories.id', request('categorie_id'))
+                    $q2->where('categories.uuid', request('categorie_id'))
                 )
             )
             ->orderBy('titre');
 
 
         if (request()->boolean('all')) {
-            $jeux = $query->get(['id', 'titre']);
+            $jeux = $query->without(['developpeur', 'plateformes', 'categories'])
+                ->get(['uuid', 'titre'])
+                ->map(fn ($jeu) => ['id' => $jeu->uuid, 'titre' => $jeu->titre]);
             return response()->json(['data' => $jeux]);
         }
 
@@ -46,13 +51,16 @@ class JeuController extends Controller
 
     public function store(StoreJeuRequest $request)
     {
-        $jeu = Jeu::create($request->validated());
+        $data = $request->validated();
+        $data['developpeur_id'] = Developpeur::where('uuid', $data['developpeur_id'])->value('id');
+
+        $jeu = Jeu::create($data);
 
         if ($request->has('plateformes')) {
-            $jeu->plateformes()->sync($request->plateformes);
+            $jeu->plateformes()->sync(Plateforme::whereIn('uuid', $request->plateformes)->pluck('id'));
         }
         if ($request->has('categories')) {
-            $jeu->categories()->sync($request->categories);
+            $jeu->categories()->sync(Categorie::whereIn('uuid', $request->categories)->pluck('id'));
         }
 
         return response()->json([
@@ -63,13 +71,18 @@ class JeuController extends Controller
 
     public function update(UpdateJeuRequest $request, Jeu $jeu)
     {
-        $jeu->update($request->validated());
+        $data = $request->validated();
+        if (isset($data['developpeur_id'])) {
+            $data['developpeur_id'] = Developpeur::where('uuid', $data['developpeur_id'])->value('id');
+        }
+
+        $jeu->update($data);
 
         if ($request->has('plateformes')) {
-            $jeu->plateformes()->sync($request->plateformes);
+            $jeu->plateformes()->sync(Plateforme::whereIn('uuid', $request->plateformes)->pluck('id'));
         }
         if ($request->has('categories')) {
-            $jeu->categories()->sync($request->categories);
+            $jeu->categories()->sync(Categorie::whereIn('uuid', $request->categories)->pluck('id'));
         }
 
         return response()->json([

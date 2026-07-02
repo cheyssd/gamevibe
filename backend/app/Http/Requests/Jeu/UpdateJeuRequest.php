@@ -15,11 +15,11 @@ class UpdateJeuRequest extends FormRequest
             'description' => 'sometimes|string',
             'image' => 'nullable|string',
             'date_sortie' => 'sometimes|date',
-            'developpeur_id' => 'sometimes|exists:developpeurs,id',
+            'developpeur_id' => 'sometimes|exists:developpeurs,uuid',
             'plateformes' => 'sometimes|array',
-            'plateformes.*' => 'exists:plateformes,id',
+            'plateformes.*' => 'exists:plateformes,uuid',
             'categories' => 'sometimes|array',
-            'categories.*' => 'exists:categories,id',
+            'categories.*' => 'exists:categories,uuid',
         ];
     }
 }

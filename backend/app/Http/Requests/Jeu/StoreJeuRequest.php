@@ -15,11 +15,11 @@ class StoreJeuRequest extends FormRequest
             'description' => 'required|string',
             'image' => 'nullable|string',
             'date_sortie' => 'required|date',
-            'developpeur_id' => 'required|exists:developpeurs,id',
+            'developpeur_id' => 'required|exists:developpeurs,uuid',
             'plateformes' => 'required|array',
-            'plateformes.*' => 'exists:plateformes,id',
+            'plateformes.*' => 'exists:plateformes,uuid',
             'categories' => 'required|array',
-            'categories.*' => 'exists:categories,id',
+            'categories.*' => 'exists:categories,uuid',
         ];
     }
 }

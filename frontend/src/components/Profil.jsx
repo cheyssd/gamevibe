@@ -284,7 +284,7 @@ export default function Profil({
             Chargement...
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { value: stats?.total_avis ?? 0, label: "Jeux notés" },
               {
@@ -295,13 +295,18 @@ export default function Profil({
             ].map(({ value, label }) => (
               <div
                 key={label}
-                className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-5 flex flex-col items-center justify-center gap-2 text-center"
+                className="bg-[#1A1A2E] rounded-2xl border border-white/5 p-5 flex flex-col items-center justify-center gap-2 text-center min-w-0"
               >
                 <span
-                  className="font-black bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent"
+                  className="font-black bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent whitespace-nowrap"
                   style={{
                     fontFamily: "'Orbitron', sans-serif",
-                    fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
+                    fontSize:
+                      String(value).length > 9
+                        ? "clamp(1rem, 2.5vw, 1.4rem)"
+                        : String(value).length > 5
+                          ? "clamp(1.2rem, 3vw, 1.75rem)"
+                          : "clamp(1.5rem, 4vw, 2.5rem)",
                   }}
                 >
                   {value}

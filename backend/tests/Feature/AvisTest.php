@@ -20,7 +20,7 @@ class AvisTest extends TestCase
         $user = User::factory()->create();
         Avis::factory()->create(['jeu_id' => $jeu->id, 'user_id' => $user->id]);
 
-        $response = $this->getJson("/api/jeux/{$jeu->id}/avis");
+        $response = $this->getJson("/api/jeux/{$jeu->uuid}/avis");
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json('data'));
@@ -34,7 +34,7 @@ class AvisTest extends TestCase
         $token = $user->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/jeux/{$jeu->id}/avis", [
+            ->postJson("/api/jeux/{$jeu->uuid}/avis", [
                 'note' => 5,
                 'commentaire' => 'Un chef-d\'oeuvre !',
             ]);
@@ -52,7 +52,7 @@ class AvisTest extends TestCase
         $developpeur = Developpeur::factory()->create();
         $jeu = Jeu::factory()->create(['developpeur_id' => $developpeur->id]);
 
-        $response = $this->postJson("/api/jeux/{$jeu->id}/avis", [
+        $response = $this->postJson("/api/jeux/{$jeu->uuid}/avis", [
             'note' => 5,
             'commentaire' => 'Un chef-d\'oeuvre !',
         ]);
@@ -70,7 +70,7 @@ class AvisTest extends TestCase
         Avis::factory()->create(['user_id' => $user->id, 'jeu_id' => $jeu->id]);
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/jeux/{$jeu->id}/avis", [
+            ->postJson("/api/jeux/{$jeu->uuid}/avis", [
                 'note' => 4,
                 'commentaire' => 'Un autre avis',
             ]);
@@ -86,7 +86,7 @@ class AvisTest extends TestCase
         $token = $user->createToken('test')->plainTextToken;
 
         $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/jeux/{$jeu->id}/avis", [
+            ->postJson("/api/jeux/{$jeu->uuid}/avis", [
                 'note' => 5,
                 'commentaire' => 'Excellent',
             ]);
@@ -103,7 +103,7 @@ class AvisTest extends TestCase
         $token = $user->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->putJson("/api/jeux/{$jeu->id}/avis/{$avis->id}", [
+            ->putJson("/api/jeux/{$jeu->uuid}/avis/{$avis->uuid}", [
                 'note' => 5,
                 'commentaire' => 'Avis modifié',
             ]);
@@ -122,7 +122,7 @@ class AvisTest extends TestCase
         $token = $user2->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->putJson("/api/jeux/{$jeu->id}/avis/{$avis->id}", [
+            ->putJson("/api/jeux/{$jeu->uuid}/avis/{$avis->uuid}", [
                 'note' => 1,
                 'commentaire' => 'Je modifie ton avis',
             ]);
@@ -139,7 +139,7 @@ class AvisTest extends TestCase
         $token = $user->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->deleteJson("/api/jeux/{$jeu->id}/avis/{$avis->id}");
+            ->deleteJson("/api/jeux/{$jeu->uuid}/avis/{$avis->uuid}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('avis', ['id' => $avis->id]);
@@ -155,7 +155,7 @@ class AvisTest extends TestCase
         $token = $admin->createToken('test')->plainTextToken;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->deleteJson("/api/jeux/{$jeu->id}/avis/{$avis->id}");
+            ->deleteJson("/api/jeux/{$jeu->uuid}/avis/{$avis->uuid}");
 
         $response->assertStatus(200);
     }

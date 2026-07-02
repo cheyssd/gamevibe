@@ -8,6 +8,7 @@ use App\Http\Requests\Avis\UpdateAvisRequest;
 use App\Http\Resources\AvisResource;
 use App\Models\Avis;
 use App\Models\Jeu;
+use Illuminate\Support\Facades\DB;
 
 class AvisController extends Controller
 {
@@ -27,7 +28,9 @@ class AvisController extends Controller
     public function indexAdmin()
     {
         $query = Avis::with(['user', 'jeu'])
-            ->when(request('jeu_id'), fn ($q) => $q->where('jeu_id', request('jeu_id')))
+            ->when(request('jeu_id'), fn ($q) => $q->whereHas('jeu', fn ($q2) =>
+                $q2->where('uuid', request('jeu_id'))
+            ))
             ->latest();
 
         $avis = $query->paginate(10);
@@ -45,31 +48,35 @@ class AvisController extends Controller
 
     public function store(StoreAvisRequest $request, Jeu $jeu)
     {
-        $existingAvis = Avis::where('user_id', $request->user()->id)
-            ->where('jeu_id', $jeu->id)
-            ->first();
+        return DB::transaction(function () use ($request, $jeu) {
+            $jeu = Jeu::where('id', $jeu->id)->lockForUpdate()->firstOrFail();
 
-        if ($existingAvis) {
+            $existingAvis = Avis::where('user_id', $request->user()->id)
+                ->where('jeu_id', $jeu->id)
+                ->first();
+
+            if ($existingAvis) {
+                return response()->json([
+                    'message' => 'Vous avez déjà posté un avis sur ce jeu'
+                ], 422);
+            }
+
+            $avis = Avis::create([
+                'user_id'     => $request->user()->id,
+                'jeu_id'      => $jeu->id,
+                'note'        => $request->note,
+                'commentaire' => $request->commentaire,
+            ]);
+
+            $jeu->update([
+                'note_moyenne' => $jeu->avis()->avg('note')
+            ]);
+
             return response()->json([
-                'message' => 'Vous avez déjà posté un avis sur ce jeu'
-            ], 422);
-        }
-
-        $avis = Avis::create([
-            'user_id'     => $request->user()->id,
-            'jeu_id'      => $jeu->id,
-            'note'        => $request->note,
-            'commentaire' => $request->commentaire,
-        ]);
-
-        $jeu->update([
-            'note_moyenne' => $jeu->avis()->avg('note')
-        ]);
-
-        return response()->json([
-            'message' => 'Avis posté avec succès',
-            'avis'    => new AvisResource($avis->load('user'))
-        ], 201);
+                'message' => 'Avis posté avec succès',
+                'avis'    => new AvisResource($avis->load('user'))
+            ], 201);
+        });
     }
 
     // Modifier un avis (connecté - propriétaire uniquement)
@@ -81,19 +88,23 @@ class AvisController extends Controller
             ], 403);
         }
 
-        $avis->update([
-            'note'        => $request->note ?? $avis->note,
-            'commentaire' => $request->commentaire ?? $avis->commentaire,
-        ]);
+        return DB::transaction(function () use ($request, $jeu, $avis) {
+            $jeu = Jeu::where('id', $jeu->id)->lockForUpdate()->firstOrFail();
 
-        $jeu->update([
-            'note_moyenne' => $jeu->avis()->avg('note')
-        ]);
+            $avis->update([
+                'note'        => $request->note ?? $avis->note,
+                'commentaire' => $request->commentaire ?? $avis->commentaire,
+            ]);
 
-        return response()->json([
-            'message' => 'Avis modifié avec succès',
-            'avis'    => new AvisResource($avis->load('user'))
-        ]);
+            $jeu->update([
+                'note_moyenne' => $jeu->avis()->avg('note')
+            ]);
+
+            return response()->json([
+                'message' => 'Avis modifié avec succès',
+                'avis'    => new AvisResource($avis->load('user'))
+            ]);
+        });
     }
 
 
@@ -107,14 +118,18 @@ class AvisController extends Controller
             ], 403);
         }
 
-        $avis->delete();
+        return DB::transaction(function () use ($jeu, $avis) {
+            $jeu = Jeu::where('id', $jeu->id)->lockForUpdate()->firstOrFail();
 
-        $jeu->update([
-            'note_moyenne' => $jeu->avis()->avg('note') ?? 0
-        ]);
+            $avis->delete();
 
-        return response()->json([
-            'message' => 'Avis supprimé avec succès'
-        ]);
+            $jeu->update([
+                'note_moyenne' => $jeu->avis()->avg('note') ?? 0
+            ]);
+
+            return response()->json([
+                'message' => 'Avis supprimé avec succès'
+            ]);
+        });
     }
 }
