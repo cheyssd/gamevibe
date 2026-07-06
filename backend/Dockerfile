@@ -1,16 +1,20 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
-# Installer les dépendances système
-RUN apt-get update && apt-get install -y \
+# Installer les dépendances système (équivalents Alpine/apk de l'image Debian d'origine)
+RUN apk add --no-cache \
     git \
     curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
     zip \
     unzip \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apk del .build-deps
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
