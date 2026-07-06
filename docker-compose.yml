@@ -49,6 +49,8 @@ services:
       DB_DATABASE: gamevibe
       DB_USERNAME: gamevibe_user
       DB_PASSWORD: gamevibe_pass
+      SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN:-}
+      SENTRY_ENVIRONMENT: local
     depends_on:
       - database
     networks:
@@ -66,6 +68,7 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}
     networks:
       - gamevibe_network
 

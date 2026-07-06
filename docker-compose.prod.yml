@@ -36,6 +36,9 @@ services:
       DB_DATABASE: gamevibe
       DB_USERNAME: gamevibe_user
       DB_PASSWORD: gamevibe_pass
+      SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN:-}
+      SENTRY_ENVIRONMENT: production
+      SENTRY_TRACES_SAMPLE_RATE: 0.2
     depends_on:
       database:
         condition: service_healthy
@@ -50,6 +53,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: http://localhost:8000/api
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     container_name: gamevibe_frontend_prod
     restart: unless-stopped
     ports:
