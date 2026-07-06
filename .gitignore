@@ -8,3 +8,7 @@ frontend/.env
 
 # Docker
 .env
+
+# Notes de travail perso (pas destinees au repo)
+JOURNAL-DE-BORD.md
+docs/
