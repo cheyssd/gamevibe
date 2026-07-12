@@ -106,8 +106,9 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
                 onClick={() => onNavigate("admin")}
                 className="px-2 py-1.5 rounded-lg text-xs text-yellow-400 border border-yellow-500/50 cursor-pointer"
                 style={{ fontFamily: "'Orbitron', sans-serif" }}
+                aria-label="Tableau de bord admin"
               >
-                <i className="bi bi-speedometer2"></i>
+                <i className="bi bi-speedometer2" aria-hidden="true"></i>
               </button>
             )}
             <button
@@ -120,8 +121,9 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
               onClick={onLogout}
               className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 border border-red-500 cursor-pointer"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
+              aria-label="Déconnexion"
             >
-              <i className="bi bi-box-arrow-right"></i>
+              <i className="bi bi-box-arrow-right" aria-hidden="true"></i>
             </button>
           </>
         ) : (
@@ -134,7 +136,12 @@ export default function Navbar({ user, onGoToLogin, onGoToRegister, onLogout, on
             </button>
           </>
         )}
-        <button onClick={() => setMenuOpen(!menuOpen)} className="ml-1 flex flex-col gap-1 p-1 cursor-pointer">
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="ml-1 flex flex-col gap-1 p-1 cursor-pointer"
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={menuOpen}
+        >
           <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "rotate-45 translate-y-1.5" : ""}`} />
           <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "opacity-0" : ""}`} />
           <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "-rotate-45 -translate-y-1.5" : ""}`} />

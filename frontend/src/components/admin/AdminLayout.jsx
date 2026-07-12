@@ -141,10 +141,16 @@ export default function AdminLayout({ user, onLogout, onNavigate }) {
             <button
               onClick={() => onNavigate("home")}
               className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded border border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
+              aria-label="Voir le site"
             >
-              <i className="bi bi-box-arrow-up-right"></i>
+              <i className="bi bi-box-arrow-up-right" aria-hidden="true"></i>
             </button>
-            <button onClick={() => setSidebarOpen(true)} className="flex flex-col gap-1 p-1 cursor-pointer">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="flex flex-col gap-1 p-1 cursor-pointer"
+              aria-label="Ouvrir le menu"
+              aria-expanded={sidebarOpen}
+            >
               <span className="block w-5 h-0.5 bg-white" />
               <span className="block w-5 h-0.5 bg-white" />
               <span className="block w-5 h-0.5 bg-white" />

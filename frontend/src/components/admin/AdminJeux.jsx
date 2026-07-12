@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../../services/api";
+import { placeholderImage } from "../../utils/placeholder";
 
 function Modal({ title, onClose, children }) {
   return (
@@ -16,8 +17,9 @@ function Modal({ title, onClose, children }) {
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white text-lg sm:text-xl cursor-pointer shrink-0 ml-2 min-h-9 min-w-9 flex items-center justify-center"
+            aria-label="Fermer"
           >
-            <i className="bi bi-x-lg"></i>
+            <i className="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
         <div className="p-4 sm:p-6">{children}</div>
@@ -411,7 +413,7 @@ export default function AdminJeux() {
                         <img
                           src={
                             jeu.image ||
-                            "https://via.placeholder.com/120x80?text=No+Image"
+                            placeholderImage(120, 80, "No image")
                           }
                           alt={jeu.titre}
                           className="h-12 w-20 rounded-lg object-cover"
@@ -453,8 +455,9 @@ export default function AdminJeux() {
                             onClick={() => openEdit(jeu)}
                             className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 cursor-pointer transition-colors min-h-8 flex items-center justify-center"
                             title="Modifier"
+                            aria-label="Modifier le jeu"
                           >
-                            <i className="bi bi-pencil"></i>
+                            <i className="bi bi-pencil" aria-hidden="true"></i>
                             <span className="hidden sm:inline ml-1">
                               Modifier
                             </span>
@@ -463,8 +466,9 @@ export default function AdminJeux() {
                             onClick={() => handleDelete(jeu.id)}
                             className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center justify-center"
                             title="Supprimer"
+                            aria-label="Supprimer le jeu"
                           >
-                            <i className="bi bi-trash"></i>
+                            <i className="bi bi-trash" aria-hidden="true"></i>
                             <span className="hidden sm:inline ml-1">
                               Supprimer
                             </span>

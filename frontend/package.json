@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/orbitron": "^5.2.8",
     "@sentry/react": "^10.63.0",
     "axios": "^1.16.1",
     "bootstrap-icons": "^1.13.1",

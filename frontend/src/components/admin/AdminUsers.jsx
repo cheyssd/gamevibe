@@ -97,8 +97,8 @@ export default function AdminUsers() {
                       <td className="px-4 py-3 text-sm text-gray-400 hidden md:table-cell whitespace-nowrap">{u.cree_le}</td>
                       <td className="px-4 py-3">
                         {u.role !== "admin" && (
-                          <button onClick={() => handleDesactiver(u.id)} className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center gap-1">
-                            <i className="bi bi-person-x"></i><span className="hidden sm:inline">Désactiver</span>
+                          <button onClick={() => handleDesactiver(u.id)} className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center gap-1" aria-label="Désactiver l'utilisateur">
+                            <i className="bi bi-person-x" aria-hidden="true"></i><span className="hidden sm:inline">Désactiver</span>
                           </button>
                         )}
                       </td>

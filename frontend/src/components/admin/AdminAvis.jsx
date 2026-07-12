@@ -187,8 +187,9 @@ export default function AdminAvis() {
                         <button
                           onClick={() => handleDelete(a.jeu?.id, a.id)}
                           className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center justify-center gap-1"
+                          aria-label="Supprimer l'avis"
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-trash" aria-hidden="true"></i>
                           <span className="hidden sm:inline">Supprimer</span>
                         </button>
                       </td>

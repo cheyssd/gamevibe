@@ -8,7 +8,7 @@ function Modal({ title, onClose, children }) {
       <div className="bg-[#1A1A2E] rounded-xl border border-violet-500/20 w-full max-w-md">
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 sticky top-0 bg-[#1A1A2E] z-10">
           <h2 className="font-bold text-white text-sm sm:text-base" style={{ fontFamily: "'Orbitron', sans-serif" }}>{title}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-lg cursor-pointer min-h-9 min-w-9 flex items-center justify-center"><i className="bi bi-x-lg"></i></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-lg cursor-pointer min-h-9 min-w-9 flex items-center justify-center" aria-label="Fermer"><i className="bi bi-x-lg" aria-hidden="true"></i></button>
         </div>
         <div className="p-4 sm:p-6">{children}</div>
       </div>
@@ -122,11 +122,11 @@ export default function AdminDeveloppeurs() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-2">
-                          <button onClick={() => openEdit(d)} className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 cursor-pointer transition-colors min-h-8 flex items-center gap-1">
-                            <i className="bi bi-pencil"></i><span className="hidden sm:inline">Modifier</span>
+                          <button onClick={() => openEdit(d)} className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 cursor-pointer transition-colors min-h-8 flex items-center gap-1" aria-label="Modifier le développeur">
+                            <i className="bi bi-pencil" aria-hidden="true"></i><span className="hidden sm:inline">Modifier</span>
                           </button>
-                          <button onClick={() => handleDelete(d.id)} className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center gap-1">
-                            <i className="bi bi-trash"></i><span className="hidden sm:inline">Supprimer</span>
+                          <button onClick={() => handleDelete(d.id)} className="text-xs px-2 sm:px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors min-h-8 flex items-center gap-1" aria-label="Supprimer le développeur">
+                            <i className="bi bi-trash" aria-hidden="true"></i><span className="hidden sm:inline">Supprimer</span>
                           </button>
                         </div>
                       </td>

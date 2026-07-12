@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../services/api";
 import Navbar from "./Navbar";
+import { placeholderImage } from "../utils/placeholder";
 
 export default function Catalogue({ user, onGoToLogin, onGoToRegister, onLogout, onNavigate, onSelectJeu }) {
   const [jeux, setJeux] = useState([]);
@@ -242,7 +243,7 @@ export default function Catalogue({ user, onGoToLogin, onGoToRegister, onLogout,
                 {/* Image */}
                 <div className="relative h-44 overflow-hidden">
                   <img
-                    src={jeu.image || "https://via.placeholder.com/400x250?text=GameVibe"}
+                    src={jeu.image || placeholderImage(400, 250)}
                     alt={jeu.titre}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

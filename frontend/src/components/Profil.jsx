@@ -18,8 +18,9 @@ function Modal({ title, onClose, children }) {
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white cursor-pointer"
+            aria-label="Fermer"
           >
-            <i className="bi bi-x-lg"></i>
+            <i className="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
         <div className="p-6">{children}</div>

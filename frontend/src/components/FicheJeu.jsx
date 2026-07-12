@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../services/api";
 import Navbar from "./Navbar";
+import { placeholderImage } from "../utils/placeholder";
 
 export default function FicheJeu({ jeuId, user, onGoToLogin, onGoToRegister, onLogout, onNavigate }) {
   const [jeu, setJeu] = useState(null);
@@ -152,7 +153,7 @@ export default function FicheJeu({ jeuId, user, onGoToLogin, onGoToRegister, onL
           <div className="md:col-span-1">
             <div className="rounded-xl overflow-hidden border border-white/10">
               <img
-                src={jeu.image || "https://via.placeholder.com/400x500?text=GameVibe"}
+                src={jeu.image || placeholderImage(400, 500)}
                 alt={jeu.titre}
                 className="w-full h-64 md:h-80 object-cover"
               />
@@ -398,8 +399,9 @@ export default function FicheJeu({ jeuId, user, onGoToLogin, onGoToRegister, onL
                                   onClick={() => openEdit(a)}
                                   className="text-xs px-2 py-1 rounded-lg bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 cursor-pointer transition-colors"
                                   title="Modifier mon avis"
+                                  aria-label="Modifier mon avis"
                                 >
-                                  <i className="bi bi-pencil"></i>
+                                  <i className="bi bi-pencil" aria-hidden="true"></i>
                                 </button>
                               )}
                               {/* Supprimer — auteur OU admin */}
@@ -408,8 +410,9 @@ export default function FicheJeu({ jeuId, user, onGoToLogin, onGoToRegister, onL
                                   onClick={() => handleDeleteAvis(a.id)}
                                   className="text-xs px-2 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 cursor-pointer transition-colors"
                                   title={user.role === "admin" && a.user?.id !== user.id ? "Supprimer (admin)" : "Supprimer mon avis"}
+                                  aria-label={user.role === "admin" && a.user?.id !== user.id ? "Supprimer l'avis (admin)" : "Supprimer mon avis"}
                                 >
-                                  <i className="bi bi-trash"></i>
+                                  <i className="bi bi-trash" aria-hidden="true"></i>
                                   {user.role === "admin" && a.user?.id !== user.id && (
                                     <span className="ml-1 text-xs hidden sm:inline">Admin</span>
                                   )}
