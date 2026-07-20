@@ -12,7 +12,7 @@
   "dependencies": {
     "@fontsource/orbitron": "^5.2.8",
     "@sentry/react": "^10.63.0",
-    "axios": "^1.16.1",
+    "axios": "^1.18.0",
     "bootstrap-icons": "^1.13.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
