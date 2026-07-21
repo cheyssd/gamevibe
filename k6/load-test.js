@@ -15,7 +15,7 @@ export const options = {
   },
 };
 
-const BASE_URL = 'https://gamevibe-production.up.railway.app/api';
+const BASE_URL = 'https://gamevibe-production-bf7f.up.railway.app/api';
 
 export default function () {
 
@@ -28,11 +28,11 @@ export default function () {
 
   sleep(1);
 
-  // Test 2 — Stats globales (utilisé par la Home)
-  const statsRes = http.get(`${BASE_URL}/admin/stats`);
+  // Test 2 — Stats globales (utilisé par la Home, endpoint public dédié)
+  const statsRes = http.get(`${BASE_URL}/stats`);
   check(statsRes, {
-    'GET /api/admin/stats — status 200': (r) => r.status === 200,
-    'GET /api/admin/stats — temps < 2s': (r) => r.timings.duration < 2000,
+    'GET /api/stats — status 200': (r) => r.status === 200,
+    'GET /api/stats — temps < 2s': (r) => r.timings.duration < 2000,
   });
 
   sleep(1);
@@ -53,3 +53,4 @@ export default function () {
 
   sleep(1);
 }
+
