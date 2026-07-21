@@ -12,3 +12,7 @@ frontend/.env
 # Notes de travail perso (pas destinees au repo)
 JOURNAL-DE-BORD.md
 docs/
+
+# Residus d'audits ponctuels (scans OWASP ZAP), gardes en local
+zap-report.html
+zap.yaml
