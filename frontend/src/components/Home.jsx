@@ -29,7 +29,7 @@ export default function Home({ onGoToLogin, onGoToRegister, onLogout, user, onNa
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await api.get("/admin/stats");
+        const res = await api.get("/stats");
         setStats({
           totalJeux: res.data.totalJeux ?? 0,
           totalAvis: res.data.totalAvis ?? 0,

@@ -23,6 +23,10 @@ Route::get('/categories',  [CategorieController::class, 'index']);
 Route::get('/plateformes', [PlateformeController::class, 'index']);
 Route::get('/developpeurs',[DeveloppeurController::class, 'index']);
 
+// Statistiques globales publiques (page d'accueil) - distinct de /admin/stats,
+// corrige le bug documente dans audit-bugs-reproduits.md (bug 2)
+Route::get('/stats', [AdminController::class, 'publicStats']);
+
 //  ROUTES PRIVÉES (connecté)
 Route::middleware('auth:sanctum')->group(function () {
 

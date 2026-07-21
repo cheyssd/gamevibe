@@ -21,4 +21,18 @@ class AdminController extends Controller
             'totalPlateformes' => Plateforme::count(),
         ]);
     }
+
+    /**
+     * Statistiques globales pour la page d'accueil publique.
+     * Volontairement distinct de stats() (espace admin) : n'expose que
+     * les 3 compteurs affiches publiquement, pas de middleware admin requis.
+     */
+    public function publicStats()
+    {
+        return response()->json([
+            'totalJeux' => Jeu::count(),
+            'totalAvis' => Avis::count(),
+            'totalUsers' => User::count(),
+        ]);
+    }
 }
