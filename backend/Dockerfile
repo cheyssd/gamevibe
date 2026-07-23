@@ -1,5 +1,8 @@
 FROM php:8.2-fpm-alpine
 
+# Appliquer les correctifs de sécurité Alpine disponibles (ex: CVE-2026-33630 sur c-ares)
+RUN apk update && apk upgrade --no-cache
+
 # Installer les dépendances système (équivalents Alpine/apk de l'image Debian d'origine)
 RUN apk add --no-cache \
     git \
